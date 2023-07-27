@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+const getProductValidation = z.string().max(100).nonempty({ message: "Slug is not allowed to be empty!" });
+
+const searchProductValidation = z
+  .object({
+    category: z.string().default(""),
+    name: z.string().default(""),
+    tag: z.string().default(""),
+    page: z.coerce.number({ invalid_type_error: "Page must be number!" }).min(1).positive().default(1),
+    size: z.coerce.number({ invalid_type_error: "Size must be number!" }).min(1).max(100).positive().default(10),
+  })
+  .strict();
+
+const infiniteValidation = z
+  .object({
+    category: z.string().default(""),
+    name: z.string().default(""),
+    tag: z.string().default(""),
+    size: z.coerce.number({ invalid_type_error: "Size must be number!" }).min(1).max(100).positive().default(10),
+    cursor: z.coerce.number({ invalid_type_error: "Cursor must be number!" }).positive().optional(),
+  })
+  .strict();
+
+const getBestRatedValidation = z.string({ required_error: "Category is required!" }).max(100).default("");
+
+export { getProductValidation, searchProductValidation, infiniteValidation, getBestRatedValidation };

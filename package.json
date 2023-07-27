@@ -1,0 +1,54 @@
+{
+  "name": "foody-order-rest-api",
+  "version": "1.0.0",
+  "description": "RESTful API",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js",
+    "test": "jest -i"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "keywords": [
+    "express",
+    "nodejs"
+  ],
+  "author": "sabilillah <sabilillah272@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/preset-env": "^7.22.5",
+    "@faker-js/faker": "^8.0.2",
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.3.1",
+    "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.2",
+    "babel-jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "prisma": "^4.16.2",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.16.2",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "libphonenumber-js": "^1.10.37",
+    "stripe": "^12.14.0",
+    "uuid": "^9.0.0",
+    "winston": "^3.9.0",
+    "zod": "^3.21.4"
+  },
+  "overrides": {
+    "semver": "~7.5.2"
+  }
+}
