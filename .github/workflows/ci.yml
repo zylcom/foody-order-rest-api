@@ -11,6 +11,9 @@ on:
 
 env:
   SHADOW_DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+  STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
 
 jobs:
   start_mysql:
@@ -45,5 +48,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: mysql -e 'SHOW DATABASES;' -uroot -proot
-      # - run: npm run build --if-present
-      # - run: npm test
+      - name: Testing
+        run: |
+          npm ci
+          npm test
