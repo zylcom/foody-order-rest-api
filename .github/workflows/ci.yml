@@ -49,8 +49,7 @@ jobs:
 
       - name: Prisma migration & test
         env:
-          SHADOW_DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
         run: |
