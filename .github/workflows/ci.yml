@@ -9,12 +9,6 @@ on:
   pull_request:
     branches: ["main"]
 
-env:
-  SHADOW_DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-  STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
-
 jobs:
   start_mysql:
     runs-on: ubuntu-latest
@@ -26,13 +20,13 @@ jobs:
           mysql -e 'SHOW DATABASES;' -uroot -proot
 
   test:
-    runs-on: ubuntu-latest
-
     needs: start_mysql
+    environment: production
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -41,14 +35,24 @@ jobs:
           sudo systemctl start mysql.service
           mysql -e 'CREATE DATABASE food_app;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
+
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: mysql -e 'SHOW DATABASES;' -uroot -proot
-      - name: Testing
+
+      - name: Install Deps
+        run: npm ci
+
+      - name: Prisma migration & test
+        env:
+          SHADOW_DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
         run: |
-          npm ci
+          npx prisma migrate dev --skip-seed
           npm test
