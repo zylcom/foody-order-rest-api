@@ -5,7 +5,7 @@ const get = async (req, res, next) => {
     const slug = req.params.slug;
     const result = await productService.get(slug);
 
-    res.status(200).json({ data: result });
+    res.status(200).set("Cache-Control", "public, max-age=120000").json({ data: result });
   } catch (error) {
     next(error);
   }
@@ -51,7 +51,7 @@ const getBestRated = async (req, res, next) => {
 
     const result = await productService.getBestRated(category);
 
-    res.status(200).set('Cache-Control', 'public, max-age=120000').json({ data: result });
+    res.status(200).json({ data: result });
   } catch (error) {
     next(error);
   }
