@@ -54,5 +54,5 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
         run: |
-          npx prisma migrate dev --skip-seed
+          npx prisma migrate deploy
           npm test
