@@ -19,7 +19,7 @@ jobs:
           mysql -e 'CREATE DATABASE food_app;' -uroot -proot
           mysql -e 'SHOW DATABASES;' -uroot -proot
 
-  test:
+  automation_testing:
     needs: start_mysql
     environment: production
     runs-on: ubuntu-latest
