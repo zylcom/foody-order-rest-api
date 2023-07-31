@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { createTestUser, name, phonenumberForm, removeManyCartItems, removeTestReview, removeTestUser, token, username } from "./test-util";
+import { createTestUser, removeManyCartItems, removeTestUser, token, username } from "./test-util";
 import { web } from "../src/app/web";
 import { logger } from "../src/app/logging";
 import { calculateTotalPrice } from "../src/utils";
