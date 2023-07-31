@@ -7,7 +7,7 @@ const saltRounds = 10;
 const salt = genSaltSync(saltRounds);
 const password_hash = hashSync("rahasia123", salt);
 
-const createUserCount = 100;
+const createUserCount = 20;
 
 const categories = [
   { id: 1, name: "Food", slug: "food" },

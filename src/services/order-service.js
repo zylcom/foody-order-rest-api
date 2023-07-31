@@ -3,29 +3,37 @@ import { checkoutValidation, createOrderValidation } from "../validation/order-v
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { stripe } from "../plugin/stripe.js";
+import { calculateTotalPrice } from "../utils/index.js";
 
 const create = async (username) => {
   username = validate(createOrderValidation, username);
 
-  const cart = await prismaClient.cart.findUnique({ where: { username }, include: { cartItems: { include: { product: true } } } });
+  const items = await prismaClient.cartItem.findMany({ where: { cart: { username } }, include: { product: true } });
 
-  if (cart.cartItems.length < 1) {
+  if (items.length < 1) {
     throw new ResponseError(400, "At least you must have one item in cart to create an order!");
   }
 
+  const orderItems = items.map((item) => ({
+    quantity: item.quantity,
+    price: item.product.price,
+    productName: item.product.name,
+    product: { connect: { slug: item.productSlug } },
+  }));
+
+  const totalPrice = calculateTotalPrice(items);
+
   return prismaClient.order.create({
     data: {
-      subTotal: cart.totalPrice,
-      total: cart.totalPrice,
+      subTotal: totalPrice,
+      total: totalPrice,
       items: {
-        create: cart.cartItems.map((item) => ({
-          quantity: item.quantity,
-          price: item.product.price,
-          productName: item.product.name,
-          product: { connect: { slug: item.productSlug } },
-        })),
+        create: orderItems,
       },
       user: { connect: { username } },
+    },
+    include: {
+      items: { include: { product: true } },
     },
   });
 };
