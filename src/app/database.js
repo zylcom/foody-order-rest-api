@@ -30,10 +30,10 @@ prismaClient.$on("warn", (e) => {
   logger.warn(e);
 });
 
-prismaClient.$on("info", (e) => {
-  logger.info(e);
-});
+// prismaClient.$on("info", (e) => {
+//   logger.info(e);
+// });
 
-prismaClient.$on("query", (e) => {
-  logger.info(e);
-});
+// prismaClient.$on("query", (e) => {
+//   logger.info(e);
+// });
