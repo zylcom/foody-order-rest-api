@@ -5,7 +5,10 @@ const get = async (req, res, next) => {
     const slug = req.params.slug;
     const result = await productService.get(slug);
 
-    res.status(200).set("Cache-Control", "public, max-age=31536000").json({ data: result });
+    res
+      .status(200)
+      .set({ "Cache-Control": "public, max-age=31536000", Expires: new Date(Date.now() + 5 * 60 * 1000) })
+      .json({ data: result });
   } catch (error) {
     next(error);
   }
@@ -39,7 +42,10 @@ const infinite = async (req, res, next) => {
     };
     const result = await productService.infinite(request);
 
-    res.status(200).set("Cache-Control", "public, max-age=31536000").json({ data: result.data, paging: result.paging });
+    res
+      .status(200)
+      .set({ "Cache-Control": "public, max-age=31536000", Expires: new Date(Date.now() + 5 * 60 * 1000) })
+      .json({ data: result.data, paging: result.paging });
   } catch (error) {
     next(error);
   }
