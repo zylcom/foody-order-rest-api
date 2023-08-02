@@ -12,4 +12,8 @@ const checkoutValidation = z
   })
   .strict();
 
-export { createOrderValidation, checkoutValidation };
+const getOrderValidation = z.coerce
+  .number({ invalid_type_error: "Order id must be number!", required_error: "Order id is required!" })
+  .positive({ message: "Order id must be positive number!" });
+
+export { createOrderValidation, checkoutValidation, getOrderValidation };

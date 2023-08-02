@@ -1,17 +1,6 @@
 import supertest from "supertest";
 import { web } from "../src/app/web";
 import { createTestUser, removeTestUser, token } from "./test-util";
-import { logger } from "../src/app/logging";
-
-jest.setTimeout(60000);
-
-beforeAll(async () => {
-  logger.silent = true;
-});
-
-afterAll(async () => {
-  logger.silent = false;
-});
 
 describe("GET /api/users/current/carts/items/:productSlug", function () {
   beforeEach(async () => {

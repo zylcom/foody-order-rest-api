@@ -28,6 +28,7 @@ userRouter.post("/api/products/:productSlug/like", likeProductController.like);
 userRouter.delete("/api/products/:productSlug/like", likeProductController.neutral);
 
 userRouter.post("/api/orders", orderController.create);
+userRouter.get("/api/orders/:orderId", orderController.get);
 userRouter.post("/api/orders/checkout", orderController.checkout);
 
 export { userRouter };

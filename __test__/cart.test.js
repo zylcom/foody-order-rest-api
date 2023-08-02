@@ -1,18 +1,7 @@
 import supertest from "supertest";
 import { web } from "../src/app/web";
 import { createTestUser, removeTestUser, token } from "./test-util";
-import { logger } from "../src/app/logging";
 import { calculateTotalPrice } from "../src/utils";
-
-jest.setTimeout(60000);
-
-beforeAll(() => {
-  logger.silent = true;
-});
-
-afterAll(() => {
-  logger.silent = false;
-});
 
 describe("GET /api/users/current/carts", function () {
   beforeEach(async () => {

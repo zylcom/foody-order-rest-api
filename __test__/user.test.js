@@ -2,17 +2,6 @@ import bcrypt from "bcrypt";
 import supertest from "supertest";
 import { web } from "../src/app/web.js";
 import { name, password, phonenumberForm, username, createTestUser, removeTestUser, token, getTestUser } from "./test-util.js";
-import { logger } from "../src/app/logging.js";
-
-jest.setTimeout(60000);
-
-beforeAll(() => {
-  logger.silent = true;
-});
-
-afterAll(() => {
-  logger.silent = false;
-});
 
 describe("POST /api/users", function () {
   afterEach(async () => {

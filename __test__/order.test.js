@@ -1,18 +1,6 @@
-import supertest from "supertest";
 import { createTestUser, removeManyCartItems, removeTestUser, token, username } from "./test-util";
-import { web } from "../src/app/web";
-import { logger } from "../src/app/logging";
 import { calculateTotalPrice } from "../src/utils";
-
-jest.setTimeout(60000);
-
-beforeAll(async () => {
-  logger.silent = true;
-});
-
-afterAll(async () => {
-  logger.silent = false;
-});
+import { request } from "./setup";
 
 describe("POST /api/orders", function () {
   beforeEach(async () => {
@@ -24,8 +12,8 @@ describe("POST /api/orders", function () {
   });
 
   it("should can create new order", async () => {
-    const cart = await supertest(web).get("/api/users/current/carts").set("Authorization", token);
-    const result = await supertest(web).post("/api/orders").set("Authorization", token);
+    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const result = await request.post("/api/orders").set("Authorization", token);
 
     expect(result.status).toBe(200);
     expect(result.body.data.username).toBe(username);
@@ -35,7 +23,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await supertest(web).post("/api/orders").set("Authorization", "invalid-token");
+    const result = await request.post("/api/orders").set("Authorization", "invalid-token");
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
@@ -45,7 +33,7 @@ describe("POST /api/orders", function () {
   it("should reject if item is empty", async () => {
     await removeManyCartItems();
 
-    const result = await supertest(web).post("/api/orders").set("Authorization", token);
+    const result = await request.post("/api/orders").set("Authorization", token);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -63,8 +51,8 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should can checkout order", async () => {
-    const order = await supertest(web).post("/api/orders").set("Authorization", token);
-    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const order = await request.post("/api/orders").set("Authorization", token);
+    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -72,8 +60,8 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const order = await supertest(web).post("/api/orders").set("Authorization", token);
-    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", "invalid-token");
+    const order = await request.post("/api/orders").set("Authorization", token);
+    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", "invalid-token");
 
     expect(result.status).toBe(401);
     expect(result.body.data).toBeUndefined();
@@ -81,13 +69,31 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should return old session if not expired", async () => {
-    const order = await supertest(web).post("/api/orders").set("Authorization", token);
-    const oldSession = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
-    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const order = await request.post("/api/orders").set("Authorization", token);
+    const oldSession = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
     expect(result.status).toBe(200);
     expect(result.body.data.sessionId).toBe(oldSession.body.data.sessionId);
     expect(result.body.data.url).toBe(oldSession.body.data.url);
     expect(result.body.data.createdAt).toBe(oldSession.body.data.createdAt);
+  });
+});
+
+describe("GET /api/orders/:orderId", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can get order", async () => {
+    const order = await request.post("/api/orders").set("Authorization", token);
+    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.id).toBe(order.body.data.id);
   });
 });
