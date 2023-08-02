@@ -1,20 +1,13 @@
 import supertest from "supertest";
 import { web } from "../src/app/web";
 import { createTestUser, removeTestUser, token } from "./test-util";
-import { logger } from "../src/app/logging";
-
-jest.setTimeout(60000);
 
 beforeAll(async () => {
-  logger.silent = true;
-
   await createTestUser();
 });
 
 afterAll(async () => {
   await removeTestUser();
-
-  logger.silent = false;
 });
 
 describe("POST /api/products/:productSlug/like", function () {

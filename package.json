@@ -10,11 +10,6 @@
     "test": "jest -i",
     "postinstall": "prisma generate"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    }
-  },
   "prisma": {
     "seed": "node prisma/seed.js"
   },

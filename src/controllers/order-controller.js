@@ -28,4 +28,16 @@ const checkout = async (req, res, next) => {
   }
 };
 
-export default { create, checkout };
+const get = async (req, res, next) => {
+  try {
+    const orderId = req.params.orderId;
+
+    const result = await orderService.get(orderId);
+
+    res.status(200).set("Cache-Control", "public, max-age=0, s-maxage=1, stale-while-revalidate=30").send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, checkout, get };

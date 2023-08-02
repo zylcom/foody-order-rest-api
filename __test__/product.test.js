@@ -11,17 +11,6 @@ import {
   removeTestProduct,
   removeTestUser,
 } from "./test-util";
-import { logger } from "../src/app/logging";
-
-jest.setTimeout(60000);
-
-beforeAll(() => {
-  logger.silent = true;
-});
-
-afterAll(() => {
-  logger.silent = false;
-});
 
 describe("GET /api/products/:slug", function () {
   beforeEach(async () => {
