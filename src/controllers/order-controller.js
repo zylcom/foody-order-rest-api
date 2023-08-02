@@ -16,7 +16,7 @@ const checkout = async (req, res, next) => {
   try {
     const request = {
       userId: req.user.id,
-      orderId: req.query.orderId,
+      orderId: req.query.id,
       username: req.user.username,
     };
 
