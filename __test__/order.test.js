@@ -1,6 +1,7 @@
+import supertest from "supertest";
 import { createTestUser, removeManyCartItems, removeTestUser, token, username } from "./test-util";
 import { calculateTotalPrice } from "../src/utils";
-import { request } from "./setup";
+import { web } from "../src/app/web";
 
 describe("POST /api/orders", function () {
   beforeEach(async () => {
@@ -12,8 +13,8 @@ describe("POST /api/orders", function () {
   });
 
   it("should can create new order", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
-    const result = await request.post("/api/orders").set("Authorization", token);
+    const cart = await supertest(web).get("/api/users/current/carts").set("Authorization", token);
+    const result = await supertest(web).post("/api/orders").set("Authorization", token);
 
     expect(result.status).toBe(200);
     expect(result.body.data.username).toBe(username);
@@ -23,7 +24,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await request.post("/api/orders").set("Authorization", "invalid-token");
+    const result = await supertest(web).post("/api/orders").set("Authorization", "invalid-token");
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
@@ -33,7 +34,7 @@ describe("POST /api/orders", function () {
   it("should reject if item is empty", async () => {
     await removeManyCartItems();
 
-    const result = await request.post("/api/orders").set("Authorization", token);
+    const result = await supertest(web).post("/api/orders").set("Authorization", token);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -51,11 +52,11 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should can checkout order", async () => {
-    const order = await request.post("/api/orders").set("Authorization", token);
+    const order = await supertest(web).post("/api/orders").set("Authorization", token);
 
     console.log(order.body.data.id);
 
-    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
     console.log(result.body);
 
@@ -65,8 +66,8 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const order = await request.post("/api/orders").set("Authorization", token);
-    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", "invalid-token");
+    const order = await supertest(web).post("/api/orders").set("Authorization", token);
+    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", "invalid-token");
 
     expect(result.status).toBe(401);
     expect(result.body.data).toBeUndefined();
@@ -74,12 +75,12 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should return old session if not expired", async () => {
-    const order = await request.post("/api/orders").set("Authorization", token);
+    const order = await supertest(web).post("/api/orders").set("Authorization", token);
 
     console.log(order.body.data.id);
 
-    const oldSession = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
-    const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const oldSession = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
+    const result = await supertest(web).post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
     console.log(result.body);
 
@@ -100,8 +101,8 @@ describe("GET /api/orders/:orderId", function () {
   });
 
   it("should can get order", async () => {
-    const order = await request.post("/api/orders").set("Authorization", token);
-    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", token);
+    const order = await supertest(web).post("/api/orders").set("Authorization", token);
+    const result = await supertest(web).get(`/api/orders/${order.body.data.id}`).set("Authorization", token);
 
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBe(order.body.data.id);
