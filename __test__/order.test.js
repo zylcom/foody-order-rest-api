@@ -52,6 +52,9 @@ describe("POST /api/orders/checkout", function () {
 
   it("should can checkout order", async () => {
     const order = await request.post("/api/orders").set("Authorization", token);
+
+    console.log(order.body.data.id);
+
     const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
     console.log(result.body);
@@ -72,6 +75,9 @@ describe("POST /api/orders/checkout", function () {
 
   it("should return old session if not expired", async () => {
     const order = await request.post("/api/orders").set("Authorization", token);
+
+    console.log(order.body.data.id);
+
     const oldSession = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
     const result = await request.post("/api/orders/checkout").query({ orderId: order.body.data.id }).set("Authorization", token);
 
