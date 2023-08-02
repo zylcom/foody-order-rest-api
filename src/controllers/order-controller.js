@@ -14,6 +14,8 @@ const create = async (req, res, next) => {
 
 const checkout = async (req, res, next) => {
   try {
+    console.log(req.query);
+
     const request = {
       userId: req.user.id,
       orderId: req.query.orderId,
