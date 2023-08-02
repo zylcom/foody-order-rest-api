@@ -39,8 +39,6 @@ const create = async (username) => {
 };
 
 const checkout = async (request) => {
-  console.log(request);
-
   request = validate(checkoutValidation, request);
 
   const order = await prismaClient.order.findUnique({ where: { id: request.orderId }, include: { items: { include: { product: true } }, checkoutSession: true } });
