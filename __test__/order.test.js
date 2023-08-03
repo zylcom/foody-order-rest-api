@@ -95,5 +95,6 @@ describe("GET /api/orders/:orderId", function () {
 
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBe(order.body.data.id);
+    expect(result.body.data.items).toBeDefined();
   });
 });

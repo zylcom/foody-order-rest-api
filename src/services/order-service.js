@@ -128,7 +128,7 @@ const checkout = async (request) => {
 const get = async (orderId) => {
   orderId = validate(getOrderValidation, orderId);
 
-  const order = await prismaClient.order.findUnique({ where: { id: orderId } });
+  const order = await prismaClient.order.findUnique({ where: { id: orderId }, include: { items: { include: { product: true } } } });
 
   if (!order) {
     throw new ResponseError(404, "Order not found");
