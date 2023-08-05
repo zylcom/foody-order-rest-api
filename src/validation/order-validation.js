@@ -17,4 +17,6 @@ const checkoutValidation = z
 
 const getOrderValidation = z.object({ username: usernameValidation, orderId: orderIdValidation }).strict();
 
-export { createOrderValidation, checkoutValidation, getOrderValidation };
+const cancelOrderValidation = z.object({ username: usernameValidation, orderId: orderIdValidation }).strict();
+
+export { createOrderValidation, checkoutValidation, getOrderValidation, cancelOrderValidation };
