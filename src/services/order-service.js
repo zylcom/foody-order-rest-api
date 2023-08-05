@@ -128,16 +128,16 @@ const checkout = async (request) => {
 const get = async (request) => {
   request = validate(getOrderValidation, request);
 
-  const order = await prismaClient.user.findUnique({
+  const user = await prismaClient.user.findUnique({
     where: { username: request.username },
     include: { orders: { where: { id: request.orderId }, include: { items: { include: { product: true } } } } },
   });
 
-  if (order.orders.length < 1) {
+  if (user.orders.length < 1) {
     throw new ResponseError(404, "Order not found");
   }
 
-  return order.orders[0];
+  return user.orders[0];
 };
 
 const cancel = async (request) => {
@@ -149,7 +149,7 @@ const cancel = async (request) => {
     throw new ResponseError(404, "Order not found");
   }
 
-  return prismaClient.order.update({ where: { id: order.id }, data: { status: "canceled" } });
+  return prismaClient.order.update({ where: { id: order.id }, data: { status: "canceled" }, include: { items: { include: { product: true } } } });
 };
 
 export default { create, checkout, get, cancel };
