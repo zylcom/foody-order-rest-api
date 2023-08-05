@@ -1,5 +1,5 @@
 import validate from "../validation/validation.js";
-import { cancelOrderValidation, checkoutValidation, createOrderValidation, deleteOrderValidation, getOrderValidation } from "../validation/order-validation.js";
+import { cancelOrderValidation, checkoutValidation, createOrderValidation, getOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { stripe } from "../plugin/stripe.js";
