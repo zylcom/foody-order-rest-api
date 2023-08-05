@@ -1,5 +1,5 @@
 import validate from "../validation/validation.js";
-import { checkoutValidation, createOrderValidation, deleteOrderValidation, getOrderValidation } from "../validation/order-validation.js";
+import { cancelOrderValidation, checkoutValidation, createOrderValidation, deleteOrderValidation, getOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { stripe } from "../plugin/stripe.js";
@@ -140,4 +140,16 @@ const get = async (request) => {
   return order.orders[0];
 };
 
-export default { create, checkout, get };
+const cancel = async (request) => {
+  request = validate(cancelOrderValidation, request);
+
+  const order = await get(request);
+
+  if (!order) {
+    throw new ResponseError(404, "Order not found");
+  }
+
+  return prismaClient.order.update({ where: { id: order.id }, data: { status: "canceled" } });
+};
+
+export default { create, checkout, get, cancel };

@@ -43,4 +43,19 @@ const get = async (req, res, next) => {
   }
 };
 
-export default { create, checkout, get };
+const cancel = async (req, res, next) => {
+  try {
+    const request = {
+      username: req.user.username,
+      orderId: req.params.orderId,
+    };
+
+    const result = await orderService.cancel(request);
+
+    res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, checkout, get, cancel };

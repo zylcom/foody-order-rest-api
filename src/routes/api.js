@@ -30,5 +30,6 @@ userRouter.delete("/api/products/:productSlug/like", likeProductController.neutr
 userRouter.post("/api/orders", orderController.create);
 userRouter.get("/api/orders/:orderId", orderController.get);
 userRouter.post("/api/orders/checkout", orderController.checkout);
+userRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
 export { userRouter };
