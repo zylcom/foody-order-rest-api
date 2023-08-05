@@ -148,6 +148,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBe(order.body.data.id);
     expect(result.body.data.status).toBe("canceled");
+    expect(result.body.data.items).toBeDefined();
   });
 
   it("should reject if token is invalid", async () => {
