@@ -30,9 +30,12 @@ const checkout = async (req, res, next) => {
 
 const get = async (req, res, next) => {
   try {
-    const orderId = req.params.orderId;
+    const request = {
+      username: req.user.username,
+      orderId: req.params.orderId,
+    };
 
-    const result = await orderService.get(orderId);
+    const result = await orderService.get(request);
 
     res.status(200).set("Cache-Control", "public, max-age=0, s-maxage=1, stale-while-revalidate=30").send({ data: result });
   } catch (error) {

@@ -64,9 +64,9 @@ const removeTestUser = async () => {
   await prismaClient.checkoutSession.deleteMany({});
   await prismaClient.orderItem.deleteMany({});
   await prismaClient.order.deleteMany({});
-  await prismaClient.cart.deleteMany({ where: { user: { username } } });
-  await prismaClient.profile.deleteMany({ where: { user: { username } } });
-  await prismaClient.user.deleteMany({ where: { username } });
+  await prismaClient.cart.deleteMany({});
+  await prismaClient.profile.deleteMany({});
+  await prismaClient.user.deleteMany({});
 };
 
 const getTestUser = async () => {

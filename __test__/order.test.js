@@ -97,4 +97,37 @@ describe("GET /api/orders/:orderId", function () {
     expect(result.body.data.id).toBe(order.body.data.id);
     expect(result.body.data.items).toBeDefined();
   });
+
+  it("should reject if token is invalid", async () => {
+    const order = await request.post("/api/orders").set("Authorization", token);
+    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", "invalid-token");
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.data).toBeUndefined();
+  });
+
+  it("should reject if order id is invalid", async () => {
+    await request.post("/api/orders").set("Authorization", token);
+    const result = await request.get("/api/orders/404").set("Authorization", token);
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.data).toBeUndefined();
+  });
+
+  it("should reject if get order from other user", async () => {
+    const user = await request
+      .post("/api/users")
+      .send({ username: "test-order", name: "Test Order", password: "rahasia123", phonenumberForm: { number: "+6288293106563", countryId: "ID" } });
+    const authUser = await request.post("/api/users/login").send({ username: user.body.data.username, password: "rahasia123" });
+    const product = await request.get("/api/products/pizza-0");
+    await request.put("/api/users/current/carts/items").set("Authorization", authUser.body.data.token).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const order = await request.post("/api/orders").set("Authorization", authUser.body.data.token);
+    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", token);
+
+    expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.data).toBeUndefined();
+  });
 });

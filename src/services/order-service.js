@@ -1,5 +1,5 @@
 import validate from "../validation/validation.js";
-import { checkoutValidation, createOrderValidation, getOrderValidation } from "../validation/order-validation.js";
+import { checkoutValidation, createOrderValidation, deleteOrderValidation, getOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { stripe } from "../plugin/stripe.js";
@@ -125,16 +125,19 @@ const checkout = async (request) => {
   });
 };
 
-const get = async (orderId) => {
-  orderId = validate(getOrderValidation, orderId);
+const get = async (request) => {
+  request = validate(getOrderValidation, request);
 
-  const order = await prismaClient.order.findUnique({ where: { id: orderId }, include: { items: { include: { product: true } } } });
+  const order = await prismaClient.user.findUnique({
+    where: { username: request.username },
+    include: { orders: { where: { id: request.orderId }, include: { items: { include: { product: true } } } } },
+  });
 
-  if (!order) {
+  if (order.orders.length < 1) {
     throw new ResponseError(404, "Order not found");
   }
 
-  return order;
+  return order.orders[0];
 };
 
 export default { create, checkout, get };
