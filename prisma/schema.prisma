@@ -46,7 +46,7 @@ model Product {
   averageRating Float?          @db.Float
   description   String?         @db.Text
   ingredients   String?         @db.Text
-  categorySlug    Int
+  categorySlug  String
   category      Category        @relation(fields: [categorySlug], references: [slug])
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
