@@ -1,6 +1,10 @@
 import { genSaltSync, hashSync } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import { generateUniqueRandomId, randomizeLikeProduct, randomizeReviewProduct } from "../src/utils/index.js";
+import {
+  generateUniqueRandomId,
+  randomizeLikeProduct,
+  randomizeReviewProduct,
+} from "../src/utils/index.js";
 import { prismaClient } from "../src/app/database.js";
 
 const saltRounds = 10;
@@ -82,9 +86,12 @@ async function productsData() {
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Coffee, milk.",
       description: "It's cool and refreshing.",
-      category: { connect: { id: 2 } },
+      category: { connect: { slug: "drink" } },
       tags: {
-        create: [{ tag: { connect: { id: 1 } } }, { tag: { connect: { id: 4 } } }],
+        create: [
+          { tag: { connect: { id: 1 } } },
+          { tag: { connect: { id: 4 } } },
+        ],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -99,7 +106,7 @@ async function productsData() {
       price: 8500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Egg.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Sunny-side up.",
       tags: {
         create: [{ tag: { connect: { id: 7 } } }],
@@ -117,7 +124,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Egg, milk",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's super fluffy.",
       tags: {
         create: [{ tag: { connect: { id: 7 } } }],
@@ -135,7 +142,7 @@ async function productsData() {
       price: 9500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Leek, dandelion, vinegar.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A healthy garden salad.",
       tags: {
         create: [{ tag: { connect: { id: 8 } } }],
@@ -153,7 +160,7 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Cauliflower, cheese.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It smells great!",
       tags: {
         create: [{ tag: { connect: { id: 9 } } }],
@@ -171,7 +178,7 @@ async function productsData() {
       price: 8500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Sunfish, bream fish, wheat flour.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Baked fish on a bed of herbs.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -189,7 +196,7 @@ async function productsData() {
       price: 7500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Parsnip, milk, vinegar.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's fresh and hearty.",
       tags: {
         create: [{ tag: { connect: { id: 11 } } }],
@@ -207,7 +214,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Tomato, beet.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "This is very nutritious.",
       tags: {
         create: [{ tag: { connect: { id: 12 } } }],
@@ -225,7 +232,7 @@ async function productsData() {
       price: 15000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Fried egg, milk, hashbrowns.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "You'll feel ready to take on the world!",
       tags: {
         create: [{ tag: { connect: { id: 7 } } }],
@@ -243,7 +250,7 @@ async function productsData() {
       price: 12000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Squid, wheat flour, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's so chewy.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -261,7 +268,7 @@ async function productsData() {
       price: 8500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, periwinkle, void mayonnaise.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "What's inside?",
       tags: {
         create: [{ tag: { connect: { id: 13 } } }],
@@ -279,7 +286,7 @@ async function productsData() {
       price: 7500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Common mushroom, morel, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Earthy and aromatic.",
       tags: {
         create: [{ tag: { connect: { id: 14 } } }],
@@ -297,7 +304,7 @@ async function productsData() {
       price: 9000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, tomato, cheese.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's popular for all the right reasons.",
       tags: {
         create: [{ tag: { connect: { id: 15 } } }],
@@ -315,7 +322,7 @@ async function productsData() {
       price: 7500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Green bean.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It sure is healthy.",
       tags: {
         create: [{ tag: { connect: { id: 16 } } }],
@@ -333,8 +340,9 @@ async function productsData() {
       price: 6000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Yam, sugar.",
-      category: { connect: { id: 1 } },
-      description: "Sweet and satisfying... The sugar gives it a hint of caramel.",
+      category: { connect: { slug: "food" } },
+      description:
+        "Sweet and satisfying... The sugar gives it a hint of caramel.",
       tags: {
         create: [{ tag: { connect: { id: 17 } } }],
       },
@@ -351,7 +359,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Carp.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's bland and oily.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -369,7 +377,7 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Potato, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Crispy and golden-brown!",
       tags: {
         create: [{ tag: { connect: { id: 18 } } }],
@@ -387,7 +395,7 @@ async function productsData() {
       price: 7000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, egg.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A double stack of fluffy, soft pancakes.",
       tags: {
         create: [{ tag: { connect: { id: 13 } } }],
@@ -405,7 +413,7 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Salmon, amaranth, kale.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "The lemon spritz makes it special.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -423,7 +431,7 @@ async function productsData() {
       price: 7500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Tuna, tortilla, red cabbage, mayonnaise.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It smells delicious.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -441,7 +449,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Largemouth bass, wheat flour, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Wow, the breading is perfect.",
       tags: {
         create: [{ tag: { connect: { id: 10 } } }],
@@ -459,7 +467,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Hot pepper, cheese.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Spicy breaded peppers filled with cheese.",
       tags: {
         create: [{ tag: { connect: { id: 9 } } }],
@@ -477,7 +485,7 @@ async function productsData() {
       price: 5000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A crusty baguette.",
       tags: {
         create: [{ tag: { connect: { id: 19 } } }],
@@ -495,7 +503,7 @@ async function productsData() {
       price: 12000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Coconut, shrimp, common mushroom.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "These flavors are incredible!",
       tags: {
         create: [{ tag: { connect: { id: 11 } } }],
@@ -513,7 +521,7 @@ async function productsData() {
       price: 15000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, egg, sugar, cocoa powder.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Rich and moist with a thick fudge icing.",
       tags: {
         create: [{ tag: { connect: { id: 13 } } }],
@@ -531,7 +539,7 @@ async function productsData() {
       price: 15000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Melon, wheat flour, sugar, egg.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "There's little heart candies on top.",
       tags: {
         create: [{ tag: { connect: { id: 13 } } }],
@@ -549,7 +557,7 @@ async function productsData() {
       price: 12000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Rhubarb, wheat flour, sugar.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Mmm, tangy and sweet!",
       tags: {
         create: [{ tag: { connect: { id: 20 } } }],
@@ -567,7 +575,7 @@ async function productsData() {
       price: 6000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, sugar, egg.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Very chewy.",
       tags: {
         create: [{ tag: { connect: { id: 13 } } }],
@@ -585,7 +593,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wheat flour, tomato.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "An old favorite.",
       tags: {
         create: [{ tag: { connect: { id: 21 } } }],
@@ -603,7 +611,7 @@ async function productsData() {
       price: 11000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Ell, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Greasy but flavorful.",
       tags: {
         create: [{ tag: { connect: { id: 22 } } }],
@@ -621,7 +629,7 @@ async function productsData() {
       price: 11000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Eel, hot pepper, oil.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's really spicy! Be careful.",
       tags: {
         create: [{ tag: { connect: { id: 22 } } }],
@@ -639,7 +647,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Red cabbage, radish.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Full of antioxidants.",
       tags: {
         create: [{ tag: { connect: { id: 12 } } }],
@@ -657,7 +665,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Eggplant, tomato.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Tangy, cheesy, and wonderful.",
       tags: {
         create: [{ tag: { connect: { id: 12 } } }],
@@ -675,7 +683,7 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Milk, sugar, rice.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's creamy, sweet, and fun to eat.",
       tags: {
         create: [{ tag: { connect: { id: 23 } } }],
@@ -693,7 +701,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Bread, cave carrot, eggplant.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A convenient snack for the explorer.",
       tags: {
         create: [{ tag: { connect: { id: 24 } } }],
@@ -711,7 +719,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Pumpkin, milk.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A seasonal favorite.",
       tags: {
         create: [{ tag: { connect: { id: 11 } } }],
@@ -729,7 +737,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Rainbow trout, green algae.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Pretty salty.",
       tags: {
         create: [{ tag: { connect: { id: 11 } } }],
@@ -747,7 +755,7 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Green algae.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "It's a little slimy.",
       tags: {
         create: [{ tag: { connect: { id: 11 } } }],
@@ -765,7 +773,7 @@ async function productsData() {
       price: 7500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Wild plum, wheat flour, sugar.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A traditional holiday treat.",
       tags: {
         create: [{ tag: { connect: { id: 23 } } }],
@@ -783,7 +791,7 @@ async function productsData() {
       price: 7000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "Silky pumpkin cream in a flakey crust.",
       tags: {
         create: [{ tag: { connect: { id: 20 } } }],
@@ -801,7 +809,7 @@ async function productsData() {
       price: 8500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Oil, vinegar, radish.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "The radishes are so crisp!",
       tags: {
         create: [{ tag: { connect: { id: 8 } } }],
@@ -819,8 +827,9 @@ async function productsData() {
       price: 8000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Flounder, midnight carp, squid ink.",
-      category: { connect: { id: 1 } },
-      description: "This briny pudding will really get you into the maritime mindset!",
+      category: { connect: { slug: "food" } },
+      description:
+        "This briny pudding will really get you into the maritime mindset!",
       tags: {
         create: [{ tag: { connect: { id: 23 } } }],
       },
@@ -837,7 +846,7 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Blueberry, melon, apricot.",
-      category: { connect: { id: 1 } },
+      category: { connect: { slug: "food" } },
       description: "A delicious combination of summer fruits.",
       tags: {
         create: [{ tag: { connect: { id: 8 } } }],
@@ -855,8 +864,9 @@ async function productsData() {
       price: 10000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Oil, fiddlehead fern, garlic.",
-      category: { connect: { id: 1 } },
-      description: "A creamy rice dish served with sauteed fern heads. It's a little bland.",
+      category: { connect: { slug: "food" } },
+      description:
+        "A creamy rice dish served with sauteed fern heads. It's a little bland.",
       tags: {
         create: [{ tag: { connect: { id: 12 } } }],
       },
@@ -873,7 +883,7 @@ async function productsData() {
       price: 4500,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Coffee",
-      category: { connect: { id: 2 } },
+      category: { connect: { slug: "drink" } },
       description: "It's more potent than regular coffee!",
       tags: {
         create: [{ tag: { connect: { id: 1 } } }],
@@ -891,7 +901,7 @@ async function productsData() {
       price: 5000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Tomato, shrimp, wild horseradish.",
-      category: { connect: { id: 2 } },
+      category: { connect: { slug: "drink" } },
       description: "A sumptuous appetizer made with freshly-caught shrimp.",
       tags: {
         create: [{ tag: { connect: { id: 6 } } }],
@@ -909,7 +919,7 @@ async function productsData() {
       price: 5000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Ginger, sugar.",
-      category: { connect: { id: 2 } },
+      category: { connect: { slug: "drink" } },
       description: "A zesty soda known for its soothing effect on the stomach.",
       tags: {
         create: [{ tag: { connect: { id: 25 } } }],
@@ -927,7 +937,7 @@ async function productsData() {
       price: 15000,
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Grape.",
-      category: { connect: { id: 2 } },
+      category: { connect: { slug: "drink" } },
       description: "Drink in moderation.",
       tags: {
         create: [{ tag: { connect: { id: 26 } } }],
@@ -943,7 +953,9 @@ async function productsData() {
 }
 
 async function main() {
-  const categoryCount = await prismaClient.category.createMany({ data: categories });
+  const categoryCount = await prismaClient.category.createMany({
+    data: categories,
+  });
   const tagCount = await prismaClient.tag.createMany({ data: tags });
 
   await prismaClient.user.create({
@@ -964,7 +976,10 @@ async function main() {
     include: { cart: { include: { cartItems: true } } },
   });
   users.forEach(async (user) => {
-    const result = await prismaClient.user.create({ data: { ...user, cart: { create: {} } }, include: { cart: { include: { cartItems: true } } } });
+    const result = await prismaClient.user.create({
+      data: { ...user, cart: { create: {} } },
+      include: { cart: { include: { cartItems: true } } },
+    });
 
     console.log(result);
   });
@@ -977,7 +992,10 @@ async function main() {
 
       return await Promise.all(
         products.map(async (product) => {
-          const sumRating = product.reviews.create.reduce((acc, review) => acc + review.rating, 0);
+          const sumRating = product.reviews.create.reduce(
+            (acc, review) => acc + review.rating,
+            0
+          );
 
           return await prismaClient.product.create({
             data: {
@@ -990,7 +1008,9 @@ async function main() {
               tags: product.tags,
               reviews: product.reviews,
               likes: product.likes,
-              averageRating: !!sumRating ? sumRating / product.reviews.create.length : null,
+              averageRating: !!sumRating
+                ? sumRating / product.reviews.create.length
+                : null,
             },
           });
         })
@@ -1005,9 +1025,19 @@ async function main() {
         const products = await productsData();
         const randomUniqueID = generateUniqueRandomId(47);
         const result = await prismaClient.cartItem.upsert({
-          update: { cart: { connect: { id: 1 } }, product: { connect: { slug: products[randomUniqueID].slug } }, quantity: Math.floor(Math.random() * 999) },
-          create: { cart: { connect: { id: 1 } }, product: { connect: { slug: products[randomUniqueID].slug } }, quantity: Math.floor(Math.random() * 999) },
-          where: { item: { productSlug: products[randomUniqueID].slug, cartId: 1 } },
+          update: {
+            cart: { connect: { id: 1 } },
+            product: { connect: { slug: products[randomUniqueID].slug } },
+            quantity: Math.floor(Math.random() * 999),
+          },
+          create: {
+            cart: { connect: { id: 1 } },
+            product: { connect: { slug: products[randomUniqueID].slug } },
+            quantity: Math.floor(Math.random() * 999),
+          },
+          where: {
+            item: { productSlug: products[randomUniqueID].slug, cartId: 1 },
+          },
           include: { cart: { include: { cartItems: true } }, product: true },
         });
 
@@ -1016,7 +1046,10 @@ async function main() {
         console.log(result);
       }
 
-      await prismaClient.cart.update({ where: { id: 1 }, data: { totalPrice } });
+      await prismaClient.cart.update({
+        where: { id: 1 },
+        data: { totalPrice },
+      });
 
       console.log("Successfully seeded database. Closing connection.");
     });
