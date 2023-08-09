@@ -119,7 +119,12 @@ const infinite = async (request) => {
 
   return {
     data: products,
-    paging: { nextCursor, totalProducts: totalItems, hasNextPage },
+    paging: { 
+      nextCursor,
+      totalProducts: totalItems,
+      totalPage: Math.ceil(totalItems / request.size),
+      hasNextPage
+    },
   };
 };
 
