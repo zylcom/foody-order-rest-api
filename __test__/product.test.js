@@ -80,6 +80,8 @@ describe("GET /api/products/search", function () {
       .get("/api/products/search")
       .query({ getAll: true });
 
+    console.log(result.body);
+
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
     expect(result.body.paging.page).toBe(1);
@@ -92,6 +94,8 @@ describe("GET /api/products/search", function () {
     const result = await supertest(web)
       .get("/api/products/search")
       .query({ getAll: true });
+
+    console.log(result.body);
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
@@ -154,15 +158,13 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using tag, name, category, size, page", async () => {
-    const result = await supertest(web)
-      .get("/api/products/search")
-      .query({
-        category: "food",
-        name: "pizza",
-        page: 2,
-        size: 15,
-        tag: "tag",
-      });
+    const result = await supertest(web).get("/api/products/search").query({
+      category: "food",
+      name: "pizza",
+      page: 2,
+      size: 15,
+      tag: "tag",
+    });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -248,14 +250,12 @@ describe("GET /api/products", function () {
 
   it("should can get products using cursor, name, category and tag", async () => {
     const product = await supertest(web).get("/api/products/pizza-1");
-    const result = await supertest(web)
-      .get("/api/products")
-      .query({
-        name: "1",
-        category: "foo",
-        tag: "tag",
-        cursor: product.body.data.id,
-      });
+    const result = await supertest(web).get("/api/products").query({
+      name: "1",
+      category: "foo",
+      tag: "tag",
+      cursor: product.body.data.id,
+    });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
