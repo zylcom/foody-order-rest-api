@@ -75,7 +75,7 @@ const search = async (request) => {
   const hasNextPage = await prismaClient.product
     .count({ where: { AND: filters }, skip: skip + request.size })
     .then((result) => {
-      return result > 0;
+      return result > 0 && !request.getAll;
     });
 
   return {
@@ -83,7 +83,9 @@ const search = async (request) => {
     paging: {
       page: request.page,
       totalProducts: totalItems,
-      totalPage: Math.ceil(totalItems / request.size),
+      totalPage: Math.ceil(
+        totalItems / request.getAll ? totalItems : request.size
+      ),
       hasNextPage,
     },
   };
