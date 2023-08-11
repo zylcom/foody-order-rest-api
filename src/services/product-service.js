@@ -78,14 +78,14 @@ const search = async (request) => {
       return result > 0 && !request.getAll;
     });
 
+  const divider = request.getAll ? totalItems : request.size;
+
   return {
     data: products,
     paging: {
       page: request.page,
       totalProducts: totalItems,
-      totalPage: Math.ceil(
-        totalItems / request.getAll ? totalItems : request.size
-      ),
+      totalPage: Math.ceil(totalItems / divider),
       hasNextPage,
     },
   };
