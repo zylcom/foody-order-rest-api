@@ -25,7 +25,7 @@ const search = async (req, res, next) => {
       tag: req.query.tag,
       size: req.query.size,
       page: req.query.page,
-      getAll: req.query.getAll,
+      getAll: req.query.getAll === "true" ? true : false,
     };
     const result = await productService.search(request);
 
