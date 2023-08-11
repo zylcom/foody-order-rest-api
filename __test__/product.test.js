@@ -63,7 +63,9 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search to page 2", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ page: 2 });
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ page: 2 });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -73,8 +75,40 @@ describe("GET /api/products/search", function () {
     expect(result.body.paging.hasNextPage).toBe(false);
   });
 
+  it("should can get all products", async () => {
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ getAll: true });
+
+    console.log(result.body);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(20);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.totalPage).toBe(1);
+    expect(result.body.paging.totalProducts).toBe(20);
+    expect(result.body.paging.hasNextPage).toBe(false);
+  });
+
+  it("should can get all products even with size query", async () => {
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ getAll: true });
+
+    console.log(result.body);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBe(20);
+    expect(result.body.paging.page).toBe(1);
+    expect(result.body.paging.totalPage).toBe(1);
+    expect(result.body.paging.totalProducts).toBe(20);
+    expect(result.body.paging.hasNextPage).toBe(false);
+  });
+
   it("should can search with size 15", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ size: 15 });
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ size: 15 });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(15);
@@ -85,7 +119,9 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using name", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ name: "1" });
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ name: "1" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -96,7 +132,9 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using category", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ category: "food" });
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ category: "food" });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -107,7 +145,9 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using tag", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ tag: "tag" });
+    const result = await supertest(web)
+      .get("/api/products/search")
+      .query({ tag: "tag" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -118,7 +158,13 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using tag, name, category, size, page", async () => {
-    const result = await supertest(web).get("/api/products/search").query({ category: "food", name: "pizza", page: 2, size: 15, tag: "tag" });
+    const result = await supertest(web).get("/api/products/search").query({
+      category: "food",
+      name: "pizza",
+      page: 2,
+      size: 15,
+      tag: "tag",
+    });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -150,7 +196,9 @@ describe("GET /api/products", function () {
   });
 
   it("should can get products using name", async () => {
-    const result = await supertest(web).get("/api/products").query({ name: "5" });
+    const result = await supertest(web)
+      .get("/api/products")
+      .query({ name: "5" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(2);
@@ -161,7 +209,9 @@ describe("GET /api/products", function () {
   });
 
   it("should can get products using tag", async () => {
-    const result = await supertest(web).get("/api/products").query({ tag: "tag" });
+    const result = await supertest(web)
+      .get("/api/products")
+      .query({ tag: "tag" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -172,7 +222,9 @@ describe("GET /api/products", function () {
   });
 
   it("should can get products using category", async () => {
-    const result = await supertest(web).get("/api/products").query({ category: "foo" });
+    const result = await supertest(web)
+      .get("/api/products")
+      .query({ category: "foo" });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -184,7 +236,9 @@ describe("GET /api/products", function () {
 
   it("should can get products using cursor", async () => {
     const product = await supertest(web).get("/api/products/pizza-5");
-    const result = await supertest(web).get("/api/products").query({ cursor: product.body.data.id });
+    const result = await supertest(web)
+      .get("/api/products")
+      .query({ cursor: product.body.data.id });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -196,7 +250,12 @@ describe("GET /api/products", function () {
 
   it("should can get products using cursor, name, category and tag", async () => {
     const product = await supertest(web).get("/api/products/pizza-1");
-    const result = await supertest(web).get("/api/products").query({ name: "1", category: "foo", tag: "tag", cursor: product.body.data.id });
+    const result = await supertest(web).get("/api/products").query({
+      name: "1",
+      category: "foo",
+      tag: "tag",
+      cursor: product.body.data.id,
+    });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -224,7 +283,9 @@ describe("GET /api/products/best-rated", function () {
   });
 
   it("should can get best rated products with category drink", async () => {
-    const result = await supertest(web).get("/api/products/best-rated").query({ category: "drink" });
+    const result = await supertest(web)
+      .get("/api/products/best-rated")
+      .query({ category: "drink" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBeLessThan(6);
