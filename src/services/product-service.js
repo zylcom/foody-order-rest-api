@@ -1,6 +1,11 @@
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
-import { getBestRatedValidation, getProductValidation, infiniteValidation, searchProductValidation } from "../validation/product-validation.js";
+import {
+  getBestRatedValidation,
+  getProductValidation,
+  infiniteValidation,
+  searchProductValidation,
+} from "../validation/product-validation.js";
 import validate from "../validation/validation.js";
 
 const get = async (slug) => {
@@ -9,7 +14,17 @@ const get = async (slug) => {
   const product = await prismaClient.product.findUnique({
     where: { slug },
     include: {
-      reviews: { include: { user: { select: { username: true, phonenumber: true, profile: { select: { name: true, avatar: true } } } } } },
+      reviews: {
+        include: {
+          user: {
+            select: {
+              username: true,
+              phonenumber: true,
+              profile: { select: { name: true, avatar: true } },
+            },
+          },
+        },
+      },
       likes: true,
     },
   });
@@ -36,7 +51,9 @@ const search = async (request) => {
   }
 
   if (request.tag) {
-    filters.push({ tags: { some: { tag: { slug: { contains: request.tag } } } } });
+    filters.push({
+      tags: { some: { tag: { slug: { contains: request.tag } } } },
+    });
   }
 
   const products = await prismaClient.product.findMany({
@@ -48,14 +65,18 @@ const search = async (request) => {
       tags: { select: { tag: { select: { name: true, slug: true } } } },
       likes: true,
     },
-    take: request.size,
+    take: request.getAll ? undefined : request.size,
     skip,
   });
 
-  const totalItems = await prismaClient.product.count({ where: { AND: filters } });
-  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
-    return result > 0;
+  const totalItems = await prismaClient.product.count({
+    where: { AND: filters },
   });
+  const hasNextPage = await prismaClient.product
+    .count({ where: { AND: filters }, skip: skip + request.size })
+    .then((result) => {
+      return result > 0;
+    });
 
   return {
     data: products,
@@ -119,11 +140,11 @@ const infinite = async (request) => {
 
   return {
     data: products,
-    paging: { 
+    paging: {
       nextCursor,
       totalProducts: totalItems,
       totalPage: Math.ceil(totalItems / request.size),
-      hasNextPage
+      hasNextPage,
     },
   };
 };
@@ -132,7 +153,11 @@ const getBestRated = async (category) => {
   category = validate(getBestRatedValidation, category);
 
   return await prismaClient.product
-    .findMany({ where: { category: { slug: { contains: category } } }, orderBy: { averageRating: "desc" }, include: { likes: true } })
+    .findMany({
+      where: { category: { slug: { contains: category } } },
+      orderBy: { averageRating: "desc" },
+      include: { likes: true },
+    })
     .then((result) => result.slice(0, 5));
 };
 
