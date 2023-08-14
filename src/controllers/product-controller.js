@@ -82,4 +82,18 @@ const getBestRated = async (req, res, next) => {
   }
 };
 
-export default { get, search, infinite, getBestRated };
+const update = async (req, res, next) => {
+  try {
+    const request = {
+      ...req.body,
+    };
+
+    const result = await productService.update(request);
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { get, search, infinite, getBestRated, update };

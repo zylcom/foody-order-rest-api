@@ -5,6 +5,7 @@ import {
   getProductValidation,
   infiniteValidation,
   searchProductValidation,
+  updateProductValidation,
 } from "../validation/product-validation.js";
 import validate from "../validation/validation.js";
 
@@ -163,4 +164,31 @@ const getBestRated = async (category) => {
     .then((result) => result.slice(0, 5));
 };
 
-export default { get, search, infinite, getBestRated };
+const update = async (request) => {
+  request = validate(updateProductValidation, request);
+
+  const product = await prismaClient.product.count({
+    where: { slug: request.slug },
+    include: { tag: true },
+  });
+
+  if (product < 1) {
+    throw ResponseError(404, "Product not found!");
+  }
+
+  return prismaClient.product.update({
+    where: { slug: request.slug },
+    data: {
+      name: request.name,
+      description: request.description,
+      ingredients: request.ingredients,
+      price: request.price,
+      categorySlug: request.categorySlug,
+      tags: {
+        disconnect: product.tags.map((tag) => ({ id: tag.id })),
+      },
+    },
+  });
+};
+
+export default { get, search, infinite, getBestRated, update };

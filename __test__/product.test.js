@@ -291,3 +291,25 @@ describe("GET /api/products/best-rated", function () {
     expect(result.body.data.length).toBeLessThan(6);
   });
 });
+
+describe("PUT /api/products", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can update product", async () => {
+    const result = await supertest(web)
+      .put("/api/products")
+      .send({
+        name: "Updated Product",
+        description: "Updated",
+        price: 1,
+        ingredients: "Updated",
+        tags: ["tag-2"],
+      });
+  });
+});

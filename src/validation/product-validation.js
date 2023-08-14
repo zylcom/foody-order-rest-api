@@ -50,9 +50,28 @@ const getBestRatedValidation = z
   .max(100)
   .default("");
 
+const updateProductValidation = z.object({
+  name: z
+    .string({ required_error: "Name is required!" })
+    .nonempty({ message: "Name is not allowed to be empty!" }),
+  slug: z
+    .string({ required_error: "Slug is required!" })
+    .nonempty({ message: "Slug is not allowed to be empty!" }),
+  description: z.string().default(""),
+  ingredients: z.string().default(""),
+  categorySlug: z
+    .string({ required_error: "Category slug is required!" })
+    .nonempty({ message: "Slug is not allowed to be empty!" }),
+  price: z.number().min(1).positive(),
+  tags: z.string().array().nonempty({
+    message: "Tags can't be empty!",
+  }),
+});
+
 export {
   getProductValidation,
   searchProductValidation,
   infiniteValidation,
   getBestRatedValidation,
+  updateProductValidation,
 };
