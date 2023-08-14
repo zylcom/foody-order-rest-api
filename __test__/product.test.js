@@ -10,6 +10,7 @@ import {
   productSlug,
   removeTestProduct,
   removeTestUser,
+  token,
 } from "./test-util";
 
 describe("GET /api/products/:slug", function () {
@@ -306,7 +307,8 @@ describe("PUT /api/products", function () {
         price: 1,
         ingredients: "Updated",
         tags: ["tag-2"],
-      });
+      })
+      .set("Authorization", token);
 
     console.log(result.body);
 
