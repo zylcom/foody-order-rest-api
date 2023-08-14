@@ -80,8 +80,6 @@ describe("GET /api/products/search", function () {
       .get("/api/products/search")
       .query({ getAll: true });
 
-    console.log(result.body);
-
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
     expect(result.body.paging.page).toBe(1);
@@ -94,8 +92,6 @@ describe("GET /api/products/search", function () {
     const result = await supertest(web)
       .get("/api/products/search")
       .query({ getAll: true });
-
-    console.log(result.body);
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
@@ -311,5 +307,9 @@ describe("PUT /api/products", function () {
         ingredients: "Updated",
         tags: ["tag-2"],
       });
+
+    console.log(result.body);
+
+    expect(result.status).toBe(200);
   });
 });
