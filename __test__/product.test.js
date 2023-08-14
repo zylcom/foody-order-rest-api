@@ -299,11 +299,14 @@ describe("PUT /api/products", function () {
   });
 
   it("should can update product", async () => {
+    const product = await supertest(web).get("/api/products/pizza");
     const result = await supertest(web)
       .put("/api/products")
       .send({
         name: "Updated Product",
         description: "Updated",
+        categorySlug: product.body.data.categorySlug,
+        slug: product.body.data.slug,
         price: 1,
         ingredients: "Updated",
         tags: ["tag-2"],
