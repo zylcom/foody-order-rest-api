@@ -171,7 +171,7 @@ const update = async (request) => {
     include: { tags: true },
   });
 
-  if (product < 1) {
+  if (product) {
     throw ResponseError(404, "Product not found!");
   }
 
