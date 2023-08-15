@@ -275,6 +275,9 @@ describe("PUT /api/products", function () {
 
   it("should can update product", async () => {
     const product = await request.get("/api/products/pizza-1");
+
+    console.log(product.body);
+
     const tags = [1, 2, 3].filter((id) => id !== product.body.data.tags[0].tagId);
     const categorySlug = product.body.data.categorySlug === "food" ? "drink" : "food";
     const result = await request
