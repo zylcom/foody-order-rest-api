@@ -66,13 +66,15 @@ CREATE TABLE `tags` (
 
 -- CreateTable
 CREATE TABLE `tags_on_products` (
-    `productId` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `productId` INTEGER NULL,
     `tagId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `tags_on_products_productId_idx`(`productId`),
     INDEX `tags_on_products_tagId_idx`(`tagId`),
-    PRIMARY KEY (`productId`, `tagId`)
+    UNIQUE INDEX `tags_on_products_productId_tagId_key`(`productId`, `tagId`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable

@@ -195,8 +195,6 @@ const update = async (request) => {
     },
     include: { tags: true, category: true },
   });
-
-  // prismaClient.tagOnProduct.upsert({ where: { productId_tagId: { productId: product.id } } });
 };
 
 export default { get, search, infinite, getBestRated, update };
