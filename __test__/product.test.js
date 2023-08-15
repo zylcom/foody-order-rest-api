@@ -290,6 +290,8 @@ describe("PUT /api/products", function () {
       })
       .set("Authorization", token);
 
+    console.log(result.body);
+
     expect(result.status).toBe(200);
     expect(result.body.data.name).toBe("Updated Product");
     expect(result.body.data.categorySlug).toBe(categorySlug);
@@ -297,5 +299,22 @@ describe("PUT /api/products", function () {
     expect(result.body.data.ingredients).toBe("Updated");
     expect(result.body.data.price).toBe(1);
     expect(result.body.data.tags.length).toBe(tags.length);
+  });
+
+  it("should reject if token is invalid", async () => {
+    const product = await request.get("/api/products/pizza-1");
+    const result = await request.put("/api/products").send({
+      name: "Updated Product",
+      description: "Updated",
+      slug: product.body.data.slug,
+      ingredients: "Updated",
+      categorySlug: product.body.data.categorySlug,
+      price: 1,
+      tags: [1, 2, 3],
+    });
+
+    expect(result.status).toBe(401);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
   });
 });
