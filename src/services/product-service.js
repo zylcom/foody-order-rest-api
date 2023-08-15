@@ -27,6 +27,7 @@ const get = async (slug) => {
         },
       },
       likes: true,
+      tags: true,
     },
   });
 
@@ -73,11 +74,9 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product
-    .count({ where: { AND: filters }, skip: skip + request.size })
-    .then((result) => {
-      return result > 0 && !request.getAll;
-    });
+  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
+    return result > 0 && !request.getAll;
+  });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -167,9 +166,9 @@ const getBestRated = async (category) => {
 const update = async (request) => {
   request = validate(updateProductValidation, request);
 
-  const product = await prismaClient.product.count({
+  const product = await prismaClient.product.findUnique({
     where: { slug: request.slug },
-    include: { tag: true },
+    include: { tags: true },
   });
 
   if (product < 1) {
@@ -183,12 +182,19 @@ const update = async (request) => {
       description: request.description,
       ingredients: request.ingredients,
       price: request.price,
-      categorySlug: request.categorySlug,
+      category: { connect: { slug: request.categorySlug } },
       tags: {
-        disconnect: product.tags.map((tag) => ({ id: tag.id })),
+        set: [],
+        connectOrCreate: [...request.tags].map((tag) => ({
+          where: { productId_tagId: { productId: product.id, tagId: tag.tagId || tag } },
+          create: { tagId: tag.tagId || tag },
+        })),
       },
     },
+    include: { tags: true, category: true },
   });
+
+  // prismaClient.tagOnProduct.upsert({ where: { productId_tagId: { productId: product.id } } });
 };
 
 export default { get, search, infinite, getBestRated, update };

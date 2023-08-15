@@ -83,7 +83,7 @@ model Tag {
 }
 
 model TagOnProduct {
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
   productId Int
   tag       Tag      @relation(fields: [tagId], references: [id])
   tagId     Int
