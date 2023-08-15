@@ -171,12 +171,12 @@ const update = async (request) => {
     include: { tags: true },
   });
 
-  if (product) {
-    throw ResponseError(404, "Product not found!");
+  if (!product) {
+    throw new ResponseError(404, "Product not found!");
   }
 
   return prismaClient.product.update({
-    where: { slug: request.slug },
+    where: { slug: product.slug },
     data: {
       name: request.name,
       description: request.description,
