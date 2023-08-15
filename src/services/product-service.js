@@ -5,6 +5,7 @@ import {
   getProductValidation,
   infiniteValidation,
   searchProductValidation,
+  updateProductValidation,
 } from "../validation/product-validation.js";
 import validate from "../validation/validation.js";
 
@@ -26,6 +27,7 @@ const get = async (slug) => {
         },
       },
       likes: true,
+      tags: true,
     },
   });
 
@@ -72,11 +74,9 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product
-    .count({ where: { AND: filters }, skip: skip + request.size })
-    .then((result) => {
-      return result > 0 && !request.getAll;
-    });
+  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
+    return result > 0 && !request.getAll;
+  });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -163,4 +163,36 @@ const getBestRated = async (category) => {
     .then((result) => result.slice(0, 5));
 };
 
-export default { get, search, infinite, getBestRated };
+const update = async (request) => {
+  request = validate(updateProductValidation, request);
+
+  const product = await prismaClient.product.findUnique({
+    where: { slug: request.slug },
+    include: { tags: true },
+  });
+
+  if (!product) {
+    throw new ResponseError(404, "Product not found!");
+  }
+
+  return prismaClient.product.update({
+    where: { slug: product.slug },
+    data: {
+      name: request.name,
+      description: request.description,
+      ingredients: request.ingredients,
+      price: request.price,
+      category: { connect: { slug: request.categorySlug } },
+      tags: {
+        set: [],
+        connectOrCreate: [...request.tags].map((tag) => ({
+          where: { productId_tagId: { productId: product.id, tagId: tag.tagId || tag } },
+          create: { tagId: tag.tagId || tag },
+        })),
+      },
+    },
+    include: { tags: true, category: true },
+  });
+};
+
+export default { get, search, infinite, getBestRated, update };

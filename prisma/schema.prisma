@@ -83,13 +83,14 @@ model Tag {
 }
 
 model TagOnProduct {
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
+  id        Int      @id() @default(autoincrement())
+  product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
   tag       Tag      @relation(fields: [tagId], references: [id])
   tagId     Int
   createdAt DateTime @default(now())
 
-  @@id([productId, tagId])
+  @@unique([productId, tagId])
   @@index([productId])
   @@index([tagId])
   @@map("tags_on_products")
