@@ -64,7 +64,7 @@ const search = async (request) => {
     },
     include: {
       category: { select: { name: true, slug: true } },
-      tags: true,
+      tags: { include: { tag: true } },
       likes: true,
     },
     take: request.getAll ? undefined : request.size,
