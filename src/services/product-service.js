@@ -64,7 +64,7 @@ const search = async (request) => {
     },
     include: {
       category: { select: { name: true, slug: true } },
-      tags: { select: { tag: { select: { name: true, slug: true } } } },
+      tags: true,
       likes: true,
     },
     take: request.getAll ? undefined : request.size,
@@ -74,9 +74,11 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
-    return result > 0 && !request.getAll;
-  });
+  const hasNextPage = await prismaClient.product
+    .count({ where: { AND: filters }, skip: skip + request.size })
+    .then((result) => {
+      return result > 0 && !request.getAll;
+    });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -186,7 +188,9 @@ const update = async (request) => {
       tags: {
         set: [],
         connectOrCreate: [...request.tags].map((tag) => ({
-          where: { productId_tagId: { productId: product.id, tagId: tag.tagId || tag } },
+          where: {
+            productId_tagId: { productId: product.id, tagId: tag.tagId || tag },
+          },
           create: { tagId: tag.tagId || tag },
         })),
       },
