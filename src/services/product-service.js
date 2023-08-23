@@ -195,7 +195,7 @@ const update = async (request) => {
         })),
       },
     },
-    include: { tags: true, category: true },
+    include: { tags: { include: { tag: true } }, category: true },
   });
 };
 
