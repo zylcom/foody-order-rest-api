@@ -211,3 +211,12 @@ CREATE TABLE `likes` (
     UNIQUE INDEX `likes_productSlug_username_key`(`productSlug`, `username`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `_ProductToTag` (
+    `A` INTEGER NOT NULL,
+    `B` INTEGER NOT NULL,
+
+    UNIQUE INDEX `_ProductToTag_AB_unique`(`A`, `B`),
+    INDEX `_ProductToTag_B_index`(`B`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

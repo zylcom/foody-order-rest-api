@@ -106,7 +106,7 @@ const createTestProduct = async () => {
       slug: productSlug,
       description: productDescription,
       ingredients: productIngredients,
-      tags: { create: tagsProduct.map((tag) => ({ tag: { connect: { id: tag.id } } })) },
+      tags: { connect: tagsProduct.map((tag) => ({ id: tag.id })) },
     },
   });
 };
@@ -126,7 +126,7 @@ const createManyTestProducts = async () => {
         description: productDescription + " " + i,
         ingredients: productIngredients + " " + i,
         category: { connect: { id: Math.floor(Math.random() * 2) + 1 } },
-        tags: { create: { tag: { connect: { id: Math.floor(Math.random() * 3) + 1 } } } },
+        tags: { connect: { id: Math.floor(Math.random() * 3) + 1 } },
         averageRating: Math.random() * 4 + 1,
         likes: { create: { user: { connect: { username: user.username } } } },
       },

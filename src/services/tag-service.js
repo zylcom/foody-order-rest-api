@@ -9,7 +9,7 @@ const get = () => {
 const getByCategory = (category) => {
   category = validate(getTagByCategoryValidation, category);
 
-  return prismaClient.tag.findMany({ where: { products: { some: { product: { category: { slug: category } } } } } });
+  return prismaClient.tag.findMany({ where: { products: { some: { categorySlug: category } } } });
 };
 
 export default { get, getByCategory };

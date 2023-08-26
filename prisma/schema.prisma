@@ -50,7 +50,7 @@ model Product {
   category      Category        @relation(fields: [categorySlug], references: [slug])
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  tags          TagOnProduct[]
+  tags          Tag[]
   cartItems     CartItem[]
   reviews       Review[]
   likes         LikeOnProduct[]
@@ -72,21 +72,22 @@ model Category {
 }
 
 model Tag {
-  id        Int            @id() @default(autoincrement())
-  name      String         @db.VarChar(100)
-  slug      String         @unique @db.VarChar(100)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  products  TagOnProduct[]
+  id        Int       @id() @default(autoincrement())
+  name      String    @db.VarChar(100)
+  slug      String    @unique @db.VarChar(100)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // products  TagOnProduct[]
 
   @@map("tags")
 }
 
 model TagOnProduct {
   id        Int      @id() @default(autoincrement())
-  product   Product? @relation(fields: [productId], references: [id])
+  // product   Product? @relation(fields: [productId], references: [id])
   productId Int?
-  tag       Tag      @relation(fields: [tagId], references: [id])
+  // tag       Tag      @relation(fields: [tagId], references: [id])
   tagId     Int
   createdAt DateTime @default(now())
 

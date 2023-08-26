@@ -18,24 +18,15 @@ userRouter.delete("/api/users/logout", userController.logout);
 userRouter.get("/api/users/current/carts", cartController.get);
 
 userRouter.get("/api/users/current/carts/items", cartItemController.get);
-userRouter.get(
-  "/api/users/current/carts/items/:productSlug",
-  cartItemController.find
-);
+userRouter.get("/api/users/current/carts/items/:productSlug", cartItemController.find);
 userRouter.put("/api/users/current/carts/items", cartItemController.upsert);
-userRouter.delete(
-  "/api/users/current/carts/items/:itemId",
-  cartItemController.remove
-);
+userRouter.delete("/api/users/current/carts/items/:itemId", cartItemController.remove);
 
 userRouter.post("/api/products/reviews", reviewController.create);
 userRouter.put("/api/products/reviews", reviewController.update);
 
 userRouter.post("/api/products/:productSlug/like", likeProductController.like);
-userRouter.delete(
-  "/api/products/:productSlug/like",
-  likeProductController.neutral
-);
+userRouter.delete("/api/products/:productSlug/like", likeProductController.neutral);
 
 userRouter.post("/api/orders", orderController.create);
 userRouter.get("/api/orders/:orderId", orderController.get);
@@ -43,5 +34,6 @@ userRouter.post("/api/orders/checkout", orderController.checkout);
 userRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
 userRouter.put("/api/products", productController.update);
+userRouter.delete("/api/products/:productSlug", productController.deleteProduct);
 
 export { userRouter };

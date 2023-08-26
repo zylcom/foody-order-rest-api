@@ -275,7 +275,6 @@ describe("PUT /api/products", function () {
 
   it("should can update product", async () => {
     const product = await request.get("/api/products/pizza-1");
-
     const tags = [1, 2, 3].filter((id) => id !== product.body.data.tags[0].tagId);
     const categorySlug = product.body.data.categorySlug === "food" ? "drink" : "food";
     const result = await request
@@ -314,6 +313,59 @@ describe("PUT /api/products", function () {
 
     expect(result.status).toBe(401);
     expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should can update product name", async () => {
+    const product = await request.get("/api/products/pizza-1");
+    const result = await request
+      .put("/api/products")
+      .send({
+        name: "Updated Product",
+        slug: product.body.data.slug,
+        categorySlug: product.body.data.categorySlug,
+        tags: product.body.data.tags.map((tag) => tag.id),
+      })
+      .set("Authorization", token);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.name).toBe("Updated Product");
+    expect(result.body.data.categorySlug).toBe(product.body.data.categorySlug);
+    expect(result.body.data.description).toBe(product.body.data.description);
+    expect(result.body.data.ingredients).toBe(product.body.data.ingredients);
+    expect(result.body.data.price).toBe(product.body.data.price);
+    expect(result.body.data.tags.length).toBe(product.body.data.tags.length);
+  });
+});
+
+describe("DELETE /api/products/:productSlug", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can delete product", async () => {
+    const result = await request.delete("/api/products/pizza-1").set("Authorization", token);
+    const product = await request.get("/api/products/pizza-1");
+
+    expect(result.status).toBe(200);
+    expect(product.body.errors).toBeDefined();
+  });
+
+  it("should reject if token is invalid", async () => {
+    const result = await request.delete("/api/products/pizza-1").set("Authorization", "invalid-token");
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if product not found", async () => {
+    const result = await request.delete("/api/products/pizza-404").set("Authorization", token);
+
+    expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
   });
 });

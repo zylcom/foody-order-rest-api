@@ -28,11 +28,11 @@ const getBestRatedValidation = z.string({ required_error: "Category is required!
 const updateProductValidation = z.object({
   name: z.string({ required_error: "Name is required!" }).nonempty({ message: "Name is not allowed to be empty!" }),
   slug: z.string({ required_error: "Slug is required!" }).nonempty({ message: "Slug is not allowed to be empty!" }),
-  description: z.string().default(""),
-  ingredients: z.string().default(""),
+  description: z.string().optional(),
+  ingredients: z.string().optional(),
   categorySlug: z.string({ required_error: "Category slug is required!" }).nonempty({ message: "Slug is not allowed to be empty!" }),
-  price: z.number().min(1).positive(),
-  tags: z.number().array().nonempty({
+  price: z.number().min(1).positive().optional(),
+  tags: z.number({ required_error: "Tags is required!", invalid_type_error: "Tag id must be a number!" }).array().nonempty({
     message: "Tags can't be empty!",
   }),
 });
