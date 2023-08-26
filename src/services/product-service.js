@@ -39,6 +39,7 @@ const get = async (slug) => {
 };
 
 const search = async (request) => {
+  // console.log(request);
   request = validate(searchProductValidation, request);
 
   const skip = (request.page - 1) * request.size;
@@ -54,7 +55,7 @@ const search = async (request) => {
 
   if (request.tag) {
     filters.push({
-      tags: { some: { tag: { slug: { contains: request.tag } } } },
+      tags: { some: { slug: { contains: request.tag } } },
     });
   }
 
@@ -64,7 +65,7 @@ const search = async (request) => {
     },
     include: {
       category: { select: { name: true, slug: true } },
-      tags: { include: { tag: true } },
+      tags: { select: { name: true, slug: true } },
       likes: true,
     },
     take: request.getAll ? undefined : request.size,
@@ -74,11 +75,9 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product
-    .count({ where: { AND: filters }, skip: skip + request.size })
-    .then((result) => {
-      return result > 0 && !request.getAll;
-    });
+  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
+    return result > 0 && !request.getAll;
+  });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -103,7 +102,7 @@ const infinite = async (request) => {
     where: {
       name: { contains: request.name },
       category: { slug: { contains: request.category } },
-      tags: { some: { tag: { slug: { contains: request.tag } } } },
+      tags: { some: { slug: { contains: request.tag } } },
     },
     include: {
       likes: true,
@@ -123,7 +122,7 @@ const infinite = async (request) => {
       where: {
         name: { contains: request.name },
         category: { slug: { contains: request.category } },
-        tags: { some: { tag: { slug: { contains: request.tag } } } },
+        tags: { some: { slug: { contains: request.tag } } },
       },
     })
     .then((result) => (!!result ? result : 0));
@@ -133,7 +132,7 @@ const infinite = async (request) => {
       where: {
         name: { contains: request.name },
         category: { slug: { contains: request.category } },
-        tags: { some: { tag: { slug: { contains: request.tag } } } },
+        tags: { some: { slug: { contains: request.tag } } },
       },
       cursor: { id: nextCursor },
       skip: 1,
@@ -185,18 +184,26 @@ const update = async (request) => {
       ingredients: request.ingredients,
       price: request.price,
       category: { connect: { slug: request.categorySlug } },
-      tags: {
-        set: [],
-        connectOrCreate: [...request.tags].map((tag) => ({
-          where: {
-            productId_tagId: { productId: product.id, tagId: tag.tagId || tag },
-          },
-          create: { tagId: tag.tagId || tag },
-        })),
-      },
+      tags: { set: [], connect: request.tags.map((id) => ({ id })) },
     },
-    include: { tags: { include: { tag: true } }, category: true },
+    include: { tags: true, category: true },
   });
 };
 
-export default { get, search, infinite, getBestRated, update };
+const deleteProduct = async (slug) => {
+  const countProduct = await prismaClient.product.count({ where: { slug } });
+
+  if (!countProduct) {
+    throw new ResponseError(404, "Product not found!");
+  }
+
+  const deletedItem = prismaClient.cartItem.deleteMany({ where: { productSlug: slug } });
+  const deletedProduct = prismaClient.product.delete({ where: { slug } });
+  const deletedLike = prismaClient.likeOnProduct.deleteMany({ where: { productSlug: slug } });
+
+  const transaction = await prismaClient.$transaction([deletedItem, deletedLike, deletedProduct]);
+
+  // console.log(transaction);
+};
+
+export default { get, search, infinite, getBestRated, update, deleteProduct };
