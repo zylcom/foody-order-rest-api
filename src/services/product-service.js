@@ -185,19 +185,8 @@ const update = async (request) => {
       price: request.price,
       category: { connect: { slug: request.categorySlug } },
       tags: { set: [], connect: request.tags.map((id) => ({ id })) },
-      // tags: {
-      //   set: [],
-      //   create: request.tags.map((tagId) => {
-      //     return { tag: { connect: { id: tagId } } };
-      //   }),
-
-      //   // connectOrCreate: [...request.tags].map((tag) => ({
-      //   //   where: { productId_tagId: { productId: product.id, tagId: tag.tagId || tag } },
-      //   //   create: { tagId: tag.tagId || tag },
-      //   // })),
-      // },
     },
-    include: { tags: true, category: true },
+    include: { tags: { include: { tag: true } }, category: true },
   });
 };
 
