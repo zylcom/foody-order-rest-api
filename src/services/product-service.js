@@ -186,7 +186,7 @@ const update = async (request) => {
       category: { connect: { slug: request.categorySlug } },
       tags: { set: [], connect: request.tags.map((id) => ({ id })) },
     },
-    include: { tags: { include: { tag: true } }, category: true },
+    include: { tags: true, category: true },
   });
 };
 
