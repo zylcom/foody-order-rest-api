@@ -65,7 +65,7 @@ const search = async (request) => {
     },
     include: {
       category: { select: { name: true, slug: true } },
-      tags: { select: { name: true, slug: true } },
+      tags: { select: { id: true, name: true, slug: true } },
       likes: true,
     },
     take: request.getAll ? undefined : request.size,
@@ -75,9 +75,11 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
-    return result > 0 && !request.getAll;
-  });
+  const hasNextPage = await prismaClient.product
+    .count({ where: { AND: filters }, skip: skip + request.size })
+    .then((result) => {
+      return result > 0 && !request.getAll;
+    });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -197,12 +199,15 @@ const deleteProduct = async (slug) => {
     throw new ResponseError(404, "Product not found!");
   }
 
-  const deletedItem = prismaClient.cartItem.deleteMany({ where: { productSlug: slug } });
+  const deletedItem = prismaClient.cartItem.deleteMany({
+    where: { productSlug: slug },
+  });
   const deletedProduct = prismaClient.product.delete({ where: { slug } });
   const deletedLike = prismaClient.likeOnProduct.deleteMany({ where: { productSlug: slug } });
   const deletedReview = prismaClient.review.deleteMany({ where: { productSlug: slug } });
 
   const transaction = await prismaClient.$transaction([deletedItem, deletedLike, deletedReview, deletedProduct]);
+
 
   // console.log(transaction);
 };
