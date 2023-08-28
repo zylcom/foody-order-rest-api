@@ -203,15 +203,11 @@ const deleteProduct = async (slug) => {
     where: { productSlug: slug },
   });
   const deletedProduct = prismaClient.product.delete({ where: { slug } });
-  const deletedLike = prismaClient.likeOnProduct.deleteMany({
-    where: { productSlug: slug },
-  });
+  const deletedLike = prismaClient.likeOnProduct.deleteMany({ where: { productSlug: slug } });
+  const deletedReview = prismaClient.review.deleteMany({ where: { productSlug: slug } });
 
-  const transaction = await prismaClient.$transaction([
-    deletedItem,
-    deletedLike,
-    deletedProduct,
-  ]);
+  const transaction = await prismaClient.$transaction([deletedItem, deletedLike, deletedReview, deletedProduct]);
+
 
   // console.log(transaction);
 };

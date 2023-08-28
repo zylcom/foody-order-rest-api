@@ -1,10 +1,6 @@
 import { genSaltSync, hashSync } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import {
-  generateUniqueRandomId,
-  randomizeLikeProduct,
-  randomizeReviewProduct,
-} from "../src/utils/index.js";
+import { generateUniqueRandomId, randomizeLikeProduct, randomizeReviewProduct } from "../src/utils/index.js";
 import { prismaClient } from "../src/app/database.js";
 
 const saltRounds = 10;
@@ -88,10 +84,7 @@ async function productsData() {
       description: "It's cool and refreshing.",
       category: { connect: { slug: "drink" } },
       tags: {
-        create: [
-          { tag: { connect: { id: 1 } } },
-          { tag: { connect: { id: 4 } } },
-        ],
+        connect: [{ id: 1 }, { id: 4 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -109,7 +102,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Sunny-side up.",
       tags: {
-        create: [{ tag: { connect: { id: 7 } } }],
+        connect: [{ id: 7 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -127,7 +120,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's super fluffy.",
       tags: {
-        create: [{ tag: { connect: { id: 7 } } }],
+        connect: [{ id: 7 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -145,7 +138,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A healthy garden salad.",
       tags: {
-        create: [{ tag: { connect: { id: 8 } } }],
+        connect: [{ id: 8 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -163,7 +156,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It smells great!",
       tags: {
-        create: [{ tag: { connect: { id: 9 } } }],
+        connect: [{ id: 9 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -181,7 +174,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Baked fish on a bed of herbs.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -199,7 +192,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's fresh and hearty.",
       tags: {
-        create: [{ tag: { connect: { id: 11 } } }],
+        connect: [{ id: 11 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -217,7 +210,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "This is very nutritious.",
       tags: {
-        create: [{ tag: { connect: { id: 12 } } }],
+        connect: [{ id: 12 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -235,7 +228,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "You'll feel ready to take on the world!",
       tags: {
-        create: [{ tag: { connect: { id: 7 } } }],
+        connect: [{ id: 7 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -253,7 +246,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's so chewy.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -271,7 +264,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "What's inside?",
       tags: {
-        create: [{ tag: { connect: { id: 13 } } }],
+        connect: [{ id: 13 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -289,7 +282,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Earthy and aromatic.",
       tags: {
-        create: [{ tag: { connect: { id: 14 } } }],
+        connect: [{ id: 14 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -307,7 +300,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's popular for all the right reasons.",
       tags: {
-        create: [{ tag: { connect: { id: 15 } } }],
+        connect: [{ id: 15 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -325,7 +318,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It sure is healthy.",
       tags: {
-        create: [{ tag: { connect: { id: 16 } } }],
+        connect: [{ id: 16 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -341,10 +334,9 @@ async function productsData() {
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Yam, sugar.",
       category: { connect: { slug: "food" } },
-      description:
-        "Sweet and satisfying... The sugar gives it a hint of caramel.",
+      description: "Sweet and satisfying... The sugar gives it a hint of caramel.",
       tags: {
-        create: [{ tag: { connect: { id: 17 } } }],
+        connect: [{ id: 17 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -362,7 +354,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's bland and oily.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -380,7 +372,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Crispy and golden-brown!",
       tags: {
-        create: [{ tag: { connect: { id: 18 } } }],
+        connect: [{ id: 18 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -398,7 +390,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A double stack of fluffy, soft pancakes.",
       tags: {
-        create: [{ tag: { connect: { id: 13 } } }],
+        connect: [{ id: 13 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -416,7 +408,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "The lemon spritz makes it special.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -434,7 +426,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It smells delicious.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -452,7 +444,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Wow, the breading is perfect.",
       tags: {
-        create: [{ tag: { connect: { id: 10 } } }],
+        connect: [{ id: 10 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -470,7 +462,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Spicy breaded peppers filled with cheese.",
       tags: {
-        create: [{ tag: { connect: { id: 9 } } }],
+        connect: [{ id: 9 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -488,7 +480,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A crusty baguette.",
       tags: {
-        create: [{ tag: { connect: { id: 19 } } }],
+        connect: [{ id: 19 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -506,7 +498,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "These flavors are incredible!",
       tags: {
-        create: [{ tag: { connect: { id: 11 } } }],
+        connect: [{ id: 11 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -524,7 +516,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Rich and moist with a thick fudge icing.",
       tags: {
-        create: [{ tag: { connect: { id: 13 } } }],
+        connect: [{ id: 13 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -542,7 +534,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "There's little heart candies on top.",
       tags: {
-        create: [{ tag: { connect: { id: 13 } } }],
+        connect: [{ id: 13 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -560,7 +552,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Mmm, tangy and sweet!",
       tags: {
-        create: [{ tag: { connect: { id: 20 } } }],
+        connect: [{ id: 20 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -578,7 +570,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Very chewy.",
       tags: {
-        create: [{ tag: { connect: { id: 13 } } }],
+        connect: [{ id: 13 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -596,7 +588,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "An old favorite.",
       tags: {
-        create: [{ tag: { connect: { id: 21 } } }],
+        connect: [{ id: 21 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -614,7 +606,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Greasy but flavorful.",
       tags: {
-        create: [{ tag: { connect: { id: 22 } } }],
+        connect: [{ id: 22 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -632,7 +624,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's really spicy! Be careful.",
       tags: {
-        create: [{ tag: { connect: { id: 22 } } }],
+        connect: [{ id: 22 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -650,7 +642,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Full of antioxidants.",
       tags: {
-        create: [{ tag: { connect: { id: 12 } } }],
+        connect: [{ id: 12 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -668,7 +660,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Tangy, cheesy, and wonderful.",
       tags: {
-        create: [{ tag: { connect: { id: 12 } } }],
+        connect: [{ id: 12 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -686,7 +678,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's creamy, sweet, and fun to eat.",
       tags: {
-        create: [{ tag: { connect: { id: 23 } } }],
+        connect: [{ id: 23 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -704,7 +696,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A convenient snack for the explorer.",
       tags: {
-        create: [{ tag: { connect: { id: 24 } } }],
+        connect: [{ id: 24 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -722,7 +714,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A seasonal favorite.",
       tags: {
-        create: [{ tag: { connect: { id: 11 } } }],
+        connect: [{ id: 11 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -740,7 +732,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Pretty salty.",
       tags: {
-        create: [{ tag: { connect: { id: 11 } } }],
+        connect: [{ id: 11 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -758,7 +750,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "It's a little slimy.",
       tags: {
-        create: [{ tag: { connect: { id: 11 } } }],
+        connect: [{ id: 11 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -776,7 +768,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A traditional holiday treat.",
       tags: {
-        create: [{ tag: { connect: { id: 23 } } }],
+        connect: [{ id: 23 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -794,7 +786,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "Silky pumpkin cream in a flakey crust.",
       tags: {
-        create: [{ tag: { connect: { id: 20 } } }],
+        connect: [{ id: 20 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -812,7 +804,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "The radishes are so crisp!",
       tags: {
-        create: [{ tag: { connect: { id: 8 } } }],
+        connect: [{ id: 8 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -828,10 +820,9 @@ async function productsData() {
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Flounder, midnight carp, squid ink.",
       category: { connect: { slug: "food" } },
-      description:
-        "This briny pudding will really get you into the maritime mindset!",
+      description: "This briny pudding will really get you into the maritime mindset!",
       tags: {
-        create: [{ tag: { connect: { id: 23 } } }],
+        connect: [{ id: 23 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -849,7 +840,7 @@ async function productsData() {
       category: { connect: { slug: "food" } },
       description: "A delicious combination of summer fruits.",
       tags: {
-        create: [{ tag: { connect: { id: 8 } } }],
+        connect: [{ id: 8 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -865,10 +856,9 @@ async function productsData() {
       image: "https://picsum.photos/1920/1280.webp?random",
       ingredients: "Oil, fiddlehead fern, garlic.",
       category: { connect: { slug: "food" } },
-      description:
-        "A creamy rice dish served with sauteed fern heads. It's a little bland.",
+      description: "A creamy rice dish served with sauteed fern heads. It's a little bland.",
       tags: {
-        create: [{ tag: { connect: { id: 12 } } }],
+        connect: [{ id: 12 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -886,7 +876,7 @@ async function productsData() {
       category: { connect: { slug: "drink" } },
       description: "It's more potent than regular coffee!",
       tags: {
-        create: [{ tag: { connect: { id: 1 } } }],
+        connect: [{ id: 1 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -904,7 +894,7 @@ async function productsData() {
       category: { connect: { slug: "drink" } },
       description: "A sumptuous appetizer made with freshly-caught shrimp.",
       tags: {
-        create: [{ tag: { connect: { id: 6 } } }],
+        connect: [{ id: 6 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -922,7 +912,7 @@ async function productsData() {
       category: { connect: { slug: "drink" } },
       description: "A zesty soda known for its soothing effect on the stomach.",
       tags: {
-        create: [{ tag: { connect: { id: 25 } } }],
+        connect: [{ id: 25 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -940,7 +930,7 @@ async function productsData() {
       category: { connect: { slug: "drink" } },
       description: "Drink in moderation.",
       tags: {
-        create: [{ tag: { connect: { id: 26 } } }],
+        connect: [{ id: 26 }],
       },
       likes: {
         create: await randomizeLikeProduct(createUserCount),
@@ -992,10 +982,7 @@ async function main() {
 
       return await Promise.all(
         products.map(async (product) => {
-          const sumRating = product.reviews.create.reduce(
-            (acc, review) => acc + review.rating,
-            0
-          );
+          const sumRating = product.reviews.create.reduce((acc, review) => acc + review.rating, 0);
 
           return await prismaClient.product.create({
             data: {
@@ -1008,9 +995,7 @@ async function main() {
               tags: product.tags,
               reviews: product.reviews,
               likes: product.likes,
-              averageRating: !!sumRating
-                ? sumRating / product.reviews.create.length
-                : null,
+              averageRating: !!sumRating ? sumRating / product.reviews.create.length : null,
             },
           });
         })
