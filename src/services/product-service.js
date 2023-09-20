@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import {
@@ -75,11 +76,9 @@ const search = async (request) => {
   const totalItems = await prismaClient.product.count({
     where: { AND: filters },
   });
-  const hasNextPage = await prismaClient.product
-    .count({ where: { AND: filters }, skip: skip + request.size })
-    .then((result) => {
-      return result > 0 && !request.getAll;
-    });
+  const hasNextPage = await prismaClient.product.count({ where: { AND: filters }, skip: skip + request.size }).then((result) => {
+    return result > 0 && !request.getAll;
+  });
 
   const divider = request.getAll ? totalItems : request.size;
 
@@ -170,7 +169,7 @@ const update = async (request) => {
   request = validate(updateProductValidation, request);
 
   const product = await prismaClient.product.findUnique({
-    where: { slug: request.slug },
+    where: { id: request.id },
     include: { tags: true },
   });
 
@@ -178,18 +177,31 @@ const update = async (request) => {
     throw new ResponseError(404, "Product not found!");
   }
 
-  return prismaClient.product.update({
-    where: { slug: product.slug },
-    data: {
-      name: request.name,
-      description: request.description,
-      ingredients: request.ingredients,
-      price: request.price,
-      category: { connect: { slug: request.categorySlug } },
-      tags: { set: [], connect: request.tags.map((id) => ({ id })) },
-    },
-    include: { tags: true, category: true },
-  });
+  try {
+    const result = await prismaClient.product.update({
+      where: { id: product.id },
+      data: {
+        name: request.name,
+        slug: request.slug,
+        description: request.description,
+        ingredients: request.ingredients,
+        price: request.price,
+        category: { connect: { slug: request.categorySlug } },
+        tags: { set: [], connect: request.tags.map((id) => ({ id })) },
+      },
+      include: { tags: true, category: true },
+    });
+
+    return result;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        throw new ResponseError(400, "Slug already in used!");
+      }
+    }
+
+    throw error;
+  }
 };
 
 const deleteProduct = async (slug) => {
@@ -207,7 +219,6 @@ const deleteProduct = async (slug) => {
   const deletedReview = prismaClient.review.deleteMany({ where: { productSlug: slug } });
 
   const transaction = await prismaClient.$transaction([deletedItem, deletedLike, deletedReview, deletedProduct]);
-
 
   // console.log(transaction);
 };
