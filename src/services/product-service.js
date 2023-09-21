@@ -233,16 +233,20 @@ const create = async (request) => {
     const result = await prismaClient.product.create({
       data: {
         ...request,
+        categorySlug: undefined,
+        category: { connect: { slug: request.categorySlug } },
         tags: { connect: request.tags.map((id) => ({ id })) },
       },
       include: { tags: true },
     });
 
-    console.log(result);
+    return result;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         throw new ResponseError(400, "Slug already in used!");
+      } else if (error.code === "P2025") {
+        throw new ResponseError(400, `Category with slug ${request.categorySlug} is not found!`);
       }
     }
 

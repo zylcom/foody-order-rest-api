@@ -280,6 +280,7 @@ describe("PUT /api/products", function () {
     const result = await request
       .put("/api/products")
       .send({
+        id: product.body.data.id,
         name: "Updated Product",
         description: "Updated",
         slug: product.body.data.slug,
@@ -321,6 +322,7 @@ describe("PUT /api/products", function () {
     const result = await request
       .put("/api/products")
       .send({
+        id: product.body.data.id,
         name: "Updated Product",
         slug: product.body.data.slug,
         categorySlug: product.body.data.categorySlug,
@@ -366,6 +368,149 @@ describe("DELETE /api/products/:productSlug", function () {
     const result = await request.delete("/api/products/pizza-404").set("Authorization", token);
 
     expect(result.status).toBe(404);
+    expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe("POST /api/products/create", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can create product", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        name: "New Product",
+        slug: "new-product",
+        categorySlug: "food",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.name).toBe("New Product");
+    expect(result.body.data.slug).toBe("new-product");
+    expect(result.body.data.categorySlug).toBe("food");
+    expect(result.body.data.price).toBe(1000);
+    expect(result.body.data.tags[0].id).toBe(1);
+  });
+
+  it("should reject if token is invalid", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", "invalid-token")
+      .send({
+        name: "New Product",
+        slug: "new-product",
+        categorySlug: "food",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(401);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if product name is undefined", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        slug: "new-product",
+        categorySlug: "food",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if slug is invalid", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        name: "New Product",
+        slug: "iN-Valid--slug-",
+        categorySlug: "food",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if slug is undefined", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        name: "New Product",
+        categorySlug: "food",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if price is less than 1", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        name: "New Product",
+        slug: "new-product",
+        categorySlug: "food",
+        price: 0,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if category slug is invalid", async () => {
+    const result = await request
+      .post("/api/products/create")
+      .set("Authorization", token)
+      .send({
+        name: "New Product",
+        slug: "new-product",
+        categorySlug: "invalid-category-slug",
+        price: 1000,
+        tags: [1],
+      });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
+    expect(result.body.errors).toBeDefined();
+  });
+
+  it("should reject if tags is undefined", async () => {
+    const result = await request.post("/api/products/create").set("Authorization", token).send({
+      name: "New Product",
+      slug: "new-product",
+      categorySlug: "food",
+      price: 1000,
+    });
+
+    expect(result.status).toBe(400);
+    expect(result.body.data).toBeUndefined();
     expect(result.body.errors).toBeDefined();
   });
 });
