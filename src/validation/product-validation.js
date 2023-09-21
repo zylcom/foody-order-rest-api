@@ -32,7 +32,7 @@ const updateProductValidation = z.object({
     .string({ required_error: "Slug is required!" })
     .nonempty({ message: "Slug is not allowed to be empty!" })
     .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-      message: "Product slug is invalid! Slug should only use lower case and separated with dash (-).",
+      message: "Product slug is invalid! Slug format should like 'pizza-pepper'",
     }),
   description: z.string().optional(),
   ingredients: z.string().optional(),
@@ -43,4 +43,23 @@ const updateProductValidation = z.object({
   }),
 });
 
-export { getProductValidation, searchProductValidation, infiniteValidation, getBestRatedValidation, updateProductValidation };
+const createProductValidation = z
+  .object({
+    name: z.string({ required_error: "Name is required!" }).nonempty({ message: "Name is not allowed to be empty!" }),
+    slug: z
+      .string({ required_error: "Slug is required!" })
+      .nonempty({ message: "Slug is not allowed to be empty!" })
+      .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+        message: "Product slug is invalid! Slug format should like 'pizza-pepper'",
+      }),
+    description: z.string().optional(),
+    ingredients: z.string().optional(),
+    categorySlug: z.string({ required_error: "Category slug is required!" }).nonempty({ message: "Category slug is not allowed to be empty!" }),
+    price: z.number({ invalid_type_error: "Price must be a number!", required_error: "Price is required!" }).min(1).positive(),
+    tags: z.number({ required_error: "Tags is required!", invalid_type_error: "Tag id must be a number!" }).array().nonempty({
+      message: "Tags can't be empty!",
+    }),
+  })
+  .strict();
+
+export { createProductValidation, getProductValidation, searchProductValidation, infiniteValidation, getBestRatedValidation, updateProductValidation };

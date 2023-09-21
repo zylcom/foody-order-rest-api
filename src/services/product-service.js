@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import {
+  createProductValidation,
   getBestRatedValidation,
   getProductValidation,
   infiniteValidation,
@@ -205,6 +206,8 @@ const update = async (request) => {
 };
 
 const deleteProduct = async (slug) => {
+  slug = validate(getProductValidation, slug);
+
   const countProduct = await prismaClient.product.count({ where: { slug } });
 
   if (!countProduct) {
@@ -223,4 +226,28 @@ const deleteProduct = async (slug) => {
   // console.log(transaction);
 };
 
-export default { get, search, infinite, getBestRated, update, deleteProduct };
+const create = async (request) => {
+  request = validate(createProductValidation, request);
+
+  try {
+    const result = await prismaClient.product.create({
+      data: {
+        ...request,
+        tags: { connect: request.tags.map((id) => ({ id })) },
+      },
+      include: { tags: true },
+    });
+
+    console.log(result);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        throw new ResponseError(400, "Slug already in used!");
+      }
+    }
+
+    throw error;
+  }
+};
+
+export default { create, get, search, infinite, getBestRated, update, deleteProduct };

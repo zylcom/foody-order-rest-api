@@ -76,7 +76,7 @@ const deleteProduct = async (req, res, next) => {
   try {
     const slug = req.params.productSlug;
 
-    const result = await productService.deleteProduct(slug);
+    await productService.deleteProduct(slug);
 
     res.status(200).json({ data: "Deleted!" });
   } catch (error) {
@@ -84,4 +84,16 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
-export default { get, search, infinite, getBestRated, update, deleteProduct };
+const create = async (req, res, next) => {
+  try {
+    const request = req.body;
+
+    const result = await productService.create(request);
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, get, search, infinite, getBestRated, update, deleteProduct };

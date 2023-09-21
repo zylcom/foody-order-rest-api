@@ -33,6 +33,7 @@ userRouter.get("/api/orders/:orderId", orderController.get);
 userRouter.post("/api/orders/checkout", orderController.checkout);
 userRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
+userRouter.post("/api/products/create", productController.create);
 userRouter.put("/api/products", productController.update);
 userRouter.delete("/api/products/:productSlug", productController.deleteProduct);
 
