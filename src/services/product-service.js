@@ -188,7 +188,7 @@ const update = async (request) => {
         ingredients: request.ingredients,
         price: request.price,
         category: { connect: { slug: request.categorySlug } },
-        tags: { set: [], connect: request.tags },
+        tags: { set: [], connect: request.tags.map((id) => ({ id })) },
       },
       include: { tags: true, category: true },
     });
