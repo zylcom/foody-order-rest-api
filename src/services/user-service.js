@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import validate from "../validation/validation.js";
-import { v4 as uuid } from "uuid";
+import { v4 as uuid } from "uuid/dist/index.js";
 import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation } from "../validation/user-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
