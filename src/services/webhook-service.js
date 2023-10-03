@@ -53,7 +53,7 @@ const webhook = async (request) => {
               detail: checkoutSessionCompleted.customer_details.address.line2,
               name: checkoutSessionCompleted.customer_details.name,
               phone: checkoutSessionCompleted.customer_details.phone,
-              cost: checkoutSessionCompleted.shipping_cost.amount_total,
+              cost: checkoutSessionCompleted.shipping_cost?.amount_total || 0,
             },
           },
         },
