@@ -38,9 +38,13 @@ const updateProductValidation = z.object({
   ingredients: z.string().optional(),
   categorySlug: z.string({ required_error: "Category slug is required!" }).nonempty({ message: "Category slug is not allowed to be empty!" }),
   price: z.number().min(1).positive().optional(),
-  tags: z.number({ required_error: "Tags is required!", invalid_type_error: "Tag id must be a number!" }).array().nonempty({
-    message: "Tags can't be empty!",
-  }),
+  tags: z
+    .number({ required_error: "Tags is required!", invalid_type_error: "Tag id must be a number!" })
+    .array()
+    .nonempty({
+      message: "Tags can't be empty!",
+    })
+    .transform((val) => val.map((id) => ({ id }))),
 });
 
 const createProductValidation = z
