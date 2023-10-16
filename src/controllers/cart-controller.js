@@ -11,4 +11,16 @@ const get = async (req, res, next) => {
   }
 };
 
-export default { get };
+const validateCart = async (req, res, next) => {
+  try {
+    const cart = req.body;
+
+    const result = await cartService.validateCart(cart);
+
+    res.status(200).json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { get, validateCart };
