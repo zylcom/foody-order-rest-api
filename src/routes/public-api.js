@@ -3,6 +3,7 @@ import userController from "../controllers/user-controller.js";
 import productController from "../controllers/product-controller.js";
 import tagController from "../controllers/tag-controller.js";
 import categoryController from "../controllers/category-controller.js";
+import cartController from "../controllers/cart-controller.js";
 
 const publicRouter = new express.Router();
 
@@ -18,5 +19,7 @@ publicRouter.get("/api/tags", tagController.get);
 publicRouter.get("/api/tags/:productCategory", tagController.getByCategory);
 
 publicRouter.get("/api/categories", categoryController.get);
+
+publicRouter.post("/api/carts/validate", cartController.validateCart);
 
 export { publicRouter };
