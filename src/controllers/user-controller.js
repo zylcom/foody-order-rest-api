@@ -22,8 +22,8 @@ const login = async (req, res, next) => {
 
 const get = async (req, res, next) => {
   try {
-    const username = req.user.username;
-    const result = await userService.get(username);
+    const token = req.get("Authorization");
+    const result = await userService.get(token);
 
     res.status(200).set("Cache-Control", "private, max-age=3, must-revalidate").json({ data: result });
   } catch (error) {
@@ -33,9 +33,7 @@ const get = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-    const request = req.body;
-    request.id = userId;
+    const request = { ...req.body, id: req.user.id };
 
     const result = await userService.update(request);
 

@@ -5,10 +5,15 @@ const getCartValidation = z.string().max(100).nonempty({ message: "Username is n
 const cartValidation = z
   .object({
     cartItems: z.object({}).passthrough().array(),
-    totalPrice: z.number(),
+    totalPrice: z.number({ required_error: "Total price is required!", invalid_type_error: "Total price must be a number!" }),
   })
+  .partial()
   .transform((cart) => {
     const itemsProductSlug = [];
+
+    if (Object.keys(cart).length === 0 || cart.cartItems === undefined) {
+      return { cartItems: [], totalPrice: 0 };
+    }
 
     const validCartItems = cart.cartItems.filter((item) => {
       if (

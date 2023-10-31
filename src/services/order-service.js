@@ -1,14 +1,16 @@
+import { v4 as uuid } from "uuid";
+import cartService from "./cart-service.js";
 import validate from "../validation/validation.js";
-import { cancelOrderValidation, checkoutValidation, createOrderValidation, getOrderValidation } from "../validation/order-validation.js";
+import { cancelOrderValidation, checkoutValidation, getOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { stripe } from "../plugin/stripe.js";
 import { calculateTotalPrice } from "../utils/index.js";
 
-const create = async (username) => {
-  username = validate(createOrderValidation, username);
+const frontEndBaseUrl = process.env.FRONT_END_BASE_URL;
 
-  const items = await prismaClient.cartItem.findMany({ where: { cart: { username } }, include: { product: true } });
+const create = async (request) => {
+  const items = await cartService.validateCart(request.cart).then((response) => response.cartItems);
 
   if (items.length < 1) {
     throw new ResponseError(400, "At least you must have one item in cart to create an order!");
@@ -30,7 +32,8 @@ const create = async (username) => {
       items: {
         create: orderItems,
       },
-      user: { connect: { username } },
+      user: request.username ? { connect: { username: request.username } } : undefined,
+      guestId: request.guestUserId,
     },
     include: {
       items: { include: { product: true } },
@@ -41,19 +44,22 @@ const create = async (username) => {
 const checkout = async (request) => {
   request = validate(checkoutValidation, request);
 
-  const order = await prismaClient.order.findUnique({ where: { id: request.orderId }, include: { items: { include: { product: true } }, checkoutSession: true } });
+  const order = await prismaClient.order.findUnique({
+    where: { id: request.orderId },
+    include: { items: { include: { product: true } }, checkoutSession: true, user: { include: { profile: true } } },
+  });
 
   if (!order) {
-    throw new ResponseError(404, "Order is invalid!");
+    throw new ResponseError(404, "Order not found!");
   }
 
   let stripeOptions = {
     payment_method_types: ["card"],
     currency: "usd",
     mode: "payment",
-    success_url: "http://localhost:5173/checkout?session_id={CHECKOUT_SESSION_ID}",
-    cancel_url: `http://localhost:5173/order/${order.id}`,
-    client_reference_id: request.userId,
+    success_url: `${frontEndBaseUrl}/payment/{CHECKOUT_SESSION_ID}`,
+    cancel_url: `${frontEndBaseUrl}/order/${order.id}`,
+    client_reference_id: request.userId ? request.userId : request.guestUserId,
     phone_number_collection: { enabled: true },
     shipping_address_collection: {
       allowed_countries: ["ID"],
@@ -128,16 +134,16 @@ const checkout = async (request) => {
 const get = async (request) => {
   request = validate(getOrderValidation, request);
 
-  const user = await prismaClient.user.findUnique({
-    where: { username: request.username },
-    include: { orders: { where: { id: request.orderId }, include: { items: { include: { product: true } } } } },
+  const order = await prismaClient.order.findFirst({
+    where: { AND: [{ id: request.orderId }, { OR: [{ username: request.username }, { guestId: request.guestUserId }] }] },
+    include: { payment: true, shipment: true, items: { include: { product: true } } },
   });
 
-  if (user.orders.length < 1) {
+  if (!order) {
     throw new ResponseError(404, "Order not found");
   }
 
-  return user.orders[0];
+  return order;
 };
 
 const cancel = async (request) => {

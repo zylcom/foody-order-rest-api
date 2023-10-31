@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import validate from "../validation/validation.js";
 import { v4 as uuid } from "uuid";
-import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation } from "../validation/user-validation.js";
+import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation, usernameValidation } from "../validation/user-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 
@@ -60,24 +60,28 @@ const login = async (request) => {
   return await prismaClient.user.update({ where: { username: user.username }, data: { token }, select: { token: true } });
 };
 
-const get = async (username) => {
-  username = validate(getUserValidation, username);
+const get = async (token) => {
+  if (token) {
+    token = validate(getUserValidation, token);
 
-  const user = await prismaClient.user.findUnique({
-    where: { username },
-    select: {
-      username: true,
-      phonenumber: true,
-      profile: { select: { address: true, avatar: true, name: true } },
-      cart: { select: { cartItems: { include: { product: true } } } },
-    },
-  });
+    const user = await prismaClient.user.findFirst({
+      where: { token },
+      select: {
+        username: true,
+        phonenumber: true,
+        profile: { select: { address: true, avatar: true, name: true } },
+        cart: { select: { cartItems: { include: { product: true } } } },
+      },
+    });
 
-  if (!user) {
-    throw new ResponseError(404, "User not found!");
+    if (!user) {
+      throw new ResponseError(404, "User not found!");
+    }
+
+    return user;
+  } else {
+    return { guestUserId: uuid().toString() };
   }
-
-  return user;
 };
 
 const update = async (request) => {
@@ -115,7 +119,7 @@ const update = async (request) => {
 };
 
 const logout = async (username) => {
-  username = validate(getUserValidation, username);
+  username = validate(usernameValidation, username);
 
   const user = await prismaClient.user.findUnique({ where: { username } });
 

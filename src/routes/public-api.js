@@ -1,9 +1,12 @@
 import express from "express";
-import userController from "../controllers/user-controller.js";
+import cartController from "../controllers/cart-controller.js";
+import categoryController from "../controllers/category-controller.js";
+import orderController from "../controllers/order-controller.js";
 import productController from "../controllers/product-controller.js";
 import tagController from "../controllers/tag-controller.js";
-import categoryController from "../controllers/category-controller.js";
-import cartController from "../controllers/cart-controller.js";
+import userController from "../controllers/user-controller.js";
+import { guestMiddleware } from "../middleware/guest-middleware.js";
+import paymentController from "../controllers/payment-controller.js";
 
 const publicRouter = new express.Router();
 
@@ -21,5 +24,16 @@ publicRouter.get("/api/tags/:productCategory", tagController.getByCategory);
 publicRouter.get("/api/categories", categoryController.get);
 
 publicRouter.post("/api/carts/validate", cartController.validateCart);
+
+publicRouter.get("/api/users/current", userController.get);
+
+publicRouter.use(guestMiddleware);
+
+publicRouter.post("/api/orders", orderController.create);
+publicRouter.get("/api/orders/:orderId", orderController.get);
+publicRouter.post("/api/orders/checkout", orderController.checkout);
+publicRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
+
+publicRouter.get("/api/payment/:sessionId", paymentController.get);
 
 export { publicRouter };

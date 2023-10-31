@@ -78,16 +78,13 @@ model Tag {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  // products  TagOnProduct[]
 
   @@map("tags")
 }
 
 model TagOnProduct {
   id        Int      @id() @default(autoincrement())
-  // product   Product? @relation(fields: [productId], references: [id])
   productId Int?
-  // tag       Tag      @relation(fields: [tagId], references: [id])
   tagId     Int
   createdAt DateTime @default(now())
 
@@ -144,7 +141,9 @@ model OrderItem {
 model Order {
   id                Int              @id() @default(autoincrement())
   user              User?            @relation(fields: [username], references: [username])
-  username          String
+  username          String?
+  guestId           String?
+  email             String?
   checkoutSession   CheckoutSession? @relation(fields: [checkoutSessionId], references: [sessionId])
   checkoutSessionId String?          @unique
   status            String           @default("uncomplete") @db.VarChar(50)
@@ -173,14 +172,18 @@ model CheckoutSession {
 }
 
 model Payment {
-  id        Int      @id() @default(autoincrement())
-  status    String   @default("unpaid") @db.VarChar(50)
-  method    String   @db.VarChar(50)
-  amount    Int
-  order     Order    @relation(fields: [orderId], references: [id])
-  orderId   Int      @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id() @default(autoincrement())
+  status        String   @default("unpaid") @db.VarChar(50)
+  method        String   @db.VarChar(50)
+  name          String
+  paymentIntent String
+  username      String?
+  guestId       String?
+  amount        Int
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       Int      @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("payments")
 }

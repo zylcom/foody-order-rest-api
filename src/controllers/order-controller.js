@@ -2,9 +2,13 @@ import orderService from "../services/order-service.js";
 
 const create = async (req, res, next) => {
   try {
-    const username = req.user.username;
+    const request = {
+      cart: req.body,
+      username: req?.user?.username,
+      guestUserId: req.guestUserId,
+    };
 
-    const result = await orderService.create(username);
+    const result = await orderService.create(request);
 
     res.status(200).json({ data: result });
   } catch (error) {
@@ -15,9 +19,9 @@ const create = async (req, res, next) => {
 const checkout = async (req, res, next) => {
   try {
     const request = {
-      userId: req.user.id,
+      userId: req?.user?.id,
       orderId: req.query.id,
-      username: req.user.username,
+      guestUserId: req.guestUserId,
     };
 
     const result = await orderService.checkout(request);
@@ -31,7 +35,8 @@ const checkout = async (req, res, next) => {
 const get = async (req, res, next) => {
   try {
     const request = {
-      username: req.user.username,
+      username: req?.user?.username,
+      guestUserId: req.guestUserId,
       orderId: req.params.orderId,
     };
 
@@ -46,7 +51,8 @@ const get = async (req, res, next) => {
 const cancel = async (req, res, next) => {
   try {
     const request = {
-      username: req.user.username,
+      username: req?.user?.username,
+      guestUserId: req.guestUserId,
       orderId: req.params.orderId,
     };
 

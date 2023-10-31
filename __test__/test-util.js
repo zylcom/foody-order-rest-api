@@ -6,7 +6,8 @@ const username = "test-user";
 const name = "Test User";
 const password = "rahasia";
 const phonenumberForm = { number: "+6283806163238", countryId: "ID" };
-const token = "test-token";
+const token = "1fef98b8-55e9-424d-a0be-799a01e9881d";
+const invalidToken = "1fef98b8-442d-4edb-be95-799a01e9881d";
 const productName = "Pizza";
 const productPrice = 10_000;
 const productSlug = "pizza";
@@ -17,6 +18,7 @@ const tagsProduct = [
   { id: 2, name: "Tag 2", slug: "tag-2" },
   { id: 3, name: "Tag 3", slug: "tag-3" },
 ];
+const sessionId = "cs_123";
 
 const createManyCartItems = () => {
   let items = [];
@@ -62,6 +64,7 @@ const removeTestUser = async () => {
   await removeManyCartItems();
 
   await prismaClient.checkoutSession.deleteMany({});
+  await prismaClient.payment.deleteMany({});
   await prismaClient.orderItem.deleteMany({});
   await prismaClient.order.deleteMany({});
   await prismaClient.cart.deleteMany({});
@@ -149,7 +152,36 @@ const removeTestReview = async () => {
   await prismaClient.review.deleteMany({});
 };
 
+const createPaymentTest = async (guestId) => {
+  await prismaClient.order.create({
+    data: {
+      subTotal: 1001,
+      checkoutSessionId: sessionId,
+      total: 1001,
+      items: { create: [{ price: 1001, productName: "Pizza-1", quantity: 1, product: { connect: { slug: "pizza-1" } } }] },
+      status: "complete",
+      payment: {
+        create: {
+          amount: 1001,
+          method: "card",
+          name,
+          paymentIntent: "pi_asd",
+          status: "paid",
+        },
+      },
+      guestId,
+    },
+  });
+};
+
 export {
+  createManyTestProducts,
+  createPaymentTest,
+  createTestCategory,
+  createTestProduct,
+  createTestUser,
+  getTestUser,
+  invalidToken,
   name,
   password,
   phonenumberForm,
@@ -158,16 +190,12 @@ export {
   productIngredients,
   productPrice,
   productSlug,
-  token,
-  username,
-  createManyTestProducts,
-  createTestCategory,
-  createTestProduct,
-  createTestUser,
-  getTestUser,
   removeManyCartItems,
   removeTestCategory,
   removeTestProduct,
   removeTestUser,
   removeTestReview,
+  sessionId,
+  token,
+  username,
 };

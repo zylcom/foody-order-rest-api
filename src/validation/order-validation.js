@@ -1,22 +1,24 @@
 import { z } from "zod";
 
-const orderIdValidation = z.coerce
-  .number({ invalid_type_error: "Order id must be number!", required_error: "Order id is required!" })
-  .positive({ message: "Order id must be positive number!" });
-const usernameValidation = z.string({ required_error: "Username is required!" }).nonempty({ message: "Username is not allowed to be empty!" });
-
-const createOrderValidation = z.string({ required_error: "Username is required!" }).max(100).nonempty({ message: "Username is not allowed to be empty!" });
-
-const checkoutValidation = z
+const orderValidation = z
   .object({
-    username: usernameValidation,
+    username: z.string({ required_error: "Username is required!" }).nonempty({ message: "Username is not allowed to be empty!" }),
+    guestUserId: z
+      .string({ invalid_type_error: "Guest user id must be a string!", required_error: "Guest user id is required!" })
+      .nonempty({ message: "Guest user id not allowed to be empty" })
+      .uuid({ message: "Guest user id is invalid!" }),
+    orderId: z.coerce
+      .number({ invalid_type_error: "Order id must be number!", required_error: "Order id is required!" })
+      .positive({ message: "Order id must be positive number!" }),
     userId: z.coerce.string({ required_error: "User id is required!" }).nonempty({ message: "User id is not allowed to be empty!" }),
-    orderId: orderIdValidation,
   })
+  .partial()
   .strict();
 
-const getOrderValidation = z.object({ username: usernameValidation, orderId: orderIdValidation }).strict();
+const getOrderValidation = orderValidation.required({ orderId: true });
 
-const cancelOrderValidation = z.object({ username: usernameValidation, orderId: orderIdValidation }).strict();
+const cancelOrderValidation = orderValidation.required({ orderId: true });
 
-export { createOrderValidation, checkoutValidation, getOrderValidation, cancelOrderValidation };
+const checkoutValidation = orderValidation.required({ orderId: true });
+
+export { checkoutValidation, getOrderValidation, cancelOrderValidation };
