@@ -86,6 +86,8 @@ describe("POST /api/orders/checkout", function () {
 
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
 
+    console.log(result.body)
+
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
     expect(result.body.data).toHaveProperty("url");
@@ -104,6 +106,8 @@ describe("POST /api/orders/checkout", function () {
 
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id, guest_uid: guestUser.body.data.guestUserId });
 
+    console.log(result.body)
+    
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
     expect(result.body.data).toHaveProperty("url");
@@ -131,6 +135,8 @@ describe("POST /api/orders/checkout", function () {
     const oldSession = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
 
+    console.log(result.body)
+    
     expect(result.status).toBe(200);
     expect(result.body.data.sessionId).toBe(oldSession.body.data.sessionId);
     expect(result.body.data.url).toBe(oldSession.body.data.url);
