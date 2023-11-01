@@ -16,13 +16,19 @@ const webhook = async (request) => {
     case "checkout.session.async_payment_failed":
       const checkoutSessionAsyncPaymentFailed = event.data.object;
 
-      console.log(checkoutSessionAsyncPaymentFailed, "checkout.session.async_payment_failed");
+      console.log(
+        // checkoutSessionAsyncPaymentFailed,
+        "checkout.session.async_payment_failed"
+      );
       break;
 
     case "checkout.session.async_payment_succeeded":
       const checkoutSessionAsyncPaymentSucceeded = event.data.object;
 
-      console.log(checkoutSessionAsyncPaymentSucceeded, "checkout.session.async_payment_succeeded");
+      console.log(
+        // checkoutSessionAsyncPaymentSucceeded,
+        "checkout.session.async_payment_succeeded"
+      );
       break;
 
     case "checkout.session.completed":
@@ -33,6 +39,7 @@ const webhook = async (request) => {
       const order = await prismaClient.order.update({
         where: { checkoutSessionId: checkoutSessionCompleted.id },
         data: {
+          email: checkoutSessionCompleted.customer_details.email,
           status: "onprogress",
           subTotal: checkoutSessionCompleted.amount_subtotal,
           total: checkoutSessionCompleted.amount_total,
@@ -41,6 +48,8 @@ const webhook = async (request) => {
               amount: checkoutSessionCompleted.amount_total,
               status: checkoutSessionCompleted.payment_status,
               method: checkoutSessionCompleted.payment_method_types.join(", "),
+              name: checkoutSessionCompleted.customer_details.name,
+              paymentIntent: checkoutSessionCompleted.payment_intent,
             },
           },
           shipment: {
@@ -59,13 +68,18 @@ const webhook = async (request) => {
         },
       });
 
-      await prismaClient.cart.update({ where: { username: order.username }, data: { cartItems: { deleteMany: {} } } });
+      if (order.username) {
+        await prismaClient.cart.update({ where: { username: order.username }, data: { cartItems: { deleteMany: {} } } });
+      }
       break;
 
     case "checkout.session.expired":
       const checkoutSessionExpired = event.data.object;
 
-      console.log(checkoutSessionExpired, "checkout.session.expired");
+      console.log(
+        // checkoutSessionExpired,
+        "checkout.session.expired"
+      );
       break;
 
     default:

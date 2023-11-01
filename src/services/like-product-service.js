@@ -1,8 +1,8 @@
+import productService from "./product-service.js";
 import validate from "../validation/validation.js";
 import { prismaClient } from "../app/database.js";
 import { likeValidation } from "../validation/like-product-validation.js";
 import { ResponseError } from "../errors/response-error.js";
-import productService from "./product-service.js";
 
 const like = async (request) => {
   request = validate(likeValidation, request);

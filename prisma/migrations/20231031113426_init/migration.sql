@@ -122,7 +122,9 @@ CREATE TABLE `order_items` (
 -- CreateTable
 CREATE TABLE `orders` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `username` VARCHAR(191) NOT NULL,
+    `username` VARCHAR(191) NULL,
+    `guestId` VARCHAR(191) NULL,
+    `email` VARCHAR(191) NULL,
     `checkoutSessionId` VARCHAR(191) NULL,
     `status` VARCHAR(50) NOT NULL DEFAULT 'uncomplete',
     `total` INTEGER NOT NULL,
@@ -153,6 +155,10 @@ CREATE TABLE `payments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `status` VARCHAR(50) NOT NULL DEFAULT 'unpaid',
     `method` VARCHAR(50) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `paymentIntent` VARCHAR(191) NOT NULL,
+    `username` VARCHAR(191) NULL,
+    `guestId` VARCHAR(191) NULL,
     `amount` INTEGER NOT NULL,
     `orderId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
