@@ -7,6 +7,7 @@ import tagController from "../controllers/tag-controller.js";
 import userController from "../controllers/user-controller.js";
 import { guestMiddleware } from "../middleware/guest-middleware.js";
 import paymentController from "../controllers/payment-controller.js";
+import feedbackController from "../controllers/feedback-controller.js";
 
 const publicRouter = new express.Router();
 
@@ -35,5 +36,7 @@ publicRouter.post("/api/orders/checkout", orderController.checkout);
 publicRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
 publicRouter.get("/api/payment/:sessionId", paymentController.get);
+
+publicRouter.post("/api/feedback", feedbackController.create);
 
 export { publicRouter };

@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid";
 import cartService from "./cart-service.js";
 import validate from "../validation/validation.js";
 import { cancelOrderValidation, checkoutValidation, getOrderValidation } from "../validation/order-validation.js";

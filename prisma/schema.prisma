@@ -238,3 +238,12 @@ model LikeOnProduct {
   @@index([username])
   @@map("likes")
 }
+
+model Feedback {
+  id          Int      @id() @default(autoincrement())
+  username    String?
+  guestId     String?
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
