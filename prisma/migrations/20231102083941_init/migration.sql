@@ -219,7 +219,7 @@ CREATE TABLE `likes` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Feedback` (
+CREATE TABLE `feedbacks` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(191) NULL,
     `guestId` VARCHAR(191) NULL,
