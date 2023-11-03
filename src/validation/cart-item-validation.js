@@ -6,10 +6,12 @@ const cartIdValidation = z.coerce
 
 const getCartItemValidation = z.string({ required_error: "Username is required!" }).max(100).nonempty({ message: "Username is not allowed to be empty!" });
 
-const findItemValidation = z.object({
-  cartId: cartIdValidation,
-  productSlug: z.string({ required_error: "Product slug is required!" }).nonempty({ message: "Product slug is not allowed to be empty!" }),
-});
+const findItemValidation = z
+  .object({
+    cartId: cartIdValidation,
+    productSlug: z.string({ required_error: "Product slug is required!" }).nonempty({ message: "Product slug is not allowed to be empty!" }),
+  })
+  .strict();
 
 const upsertCartItemValidation = z
   .object({
@@ -19,11 +21,6 @@ const upsertCartItemValidation = z
   })
   .strict();
 
-const deleteItemValidation = z
-  .object({
-    cartId: cartIdValidation,
-    itemId: z.coerce.number({ invalid_type_error: "Item id must be number!", required_error: "Item id is required!" }).min(1).positive(),
-  })
-  .strict();
+const deleteItemValidation = findItemValidation;
 
 export { getCartItemValidation, findItemValidation, upsertCartItemValidation, deleteItemValidation };

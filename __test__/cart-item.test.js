@@ -58,7 +58,7 @@ describe("PUT /api/users/current/carts/items", function () {
   });
 });
 
-describe("DELETE /api/users/current/carts/items/:itemId", function () {
+describe("DELETE /api/users/current/carts/items/:productSlug", function () {
   beforeEach(async () => {
     await createTestUser();
   });
@@ -69,7 +69,7 @@ describe("DELETE /api/users/current/carts/items/:itemId", function () {
 
   it("should can delete cart item of current user", async () => {
     const user = await supertest(web).get("/api/users/current").set("Authorization", token);
-    const result = await supertest(web).delete(`/api/users/current/carts/items/${user.body.data.cart.cartItems[0].id}`).set("Authorization", token);
+    const result = await supertest(web).delete(`/api/users/current/carts/items/${user.body.data.cart.cartItems[0].product.slug}`).set("Authorization", token);
     const newUserData = await supertest(web).get("/api/users/current").set("Authorization", token);
 
     expect(result.status).toBe(200);

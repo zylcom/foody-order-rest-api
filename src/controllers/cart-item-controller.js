@@ -40,7 +40,7 @@ const upsert = async (req, res, next) => {
 const remove = async (req, res, next) => {
   try {
     const request = {
-      itemId: req.params.itemId,
+      productSlug: req.params.productSlug,
       cartId: req.user.cart.id,
     };
 

@@ -18,7 +18,7 @@ userRouter.get("/api/users/current/carts", cartController.get);
 userRouter.get("/api/users/current/carts/items", cartItemController.get);
 userRouter.get("/api/users/current/carts/items/:productSlug", cartItemController.find);
 userRouter.put("/api/users/current/carts/items", cartItemController.upsert);
-userRouter.delete("/api/users/current/carts/items/:itemId", cartItemController.remove);
+userRouter.delete("/api/users/current/carts/items/:productSlug", cartItemController.remove);
 
 userRouter.post("/api/products/reviews", reviewController.create);
 userRouter.put("/api/products/reviews", reviewController.update);
