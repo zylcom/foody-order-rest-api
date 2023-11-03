@@ -57,13 +57,13 @@ const upsert = async (request) => {
 const remove = async (request) => {
   request = validate(deleteItemValidation, request);
 
-  const countItems = await prismaClient.cartItem.count({ where: { id: request.itemId } });
+  const countItems = await prismaClient.cartItem.count({ where: { AND: [{ cartId: request.cartId }, { productSlug: request.productSlug }] } });
 
   if (countItems !== 1) {
     throw new ResponseError(404, "Cart item not found");
   }
 
-  await prismaClient.cartItem.delete({ where: { id: request.itemId } }).then(async (result) => {
+  await prismaClient.cartItem.delete({ where: { item: { cartId: request.cartId, productSlug: request.productSlug } } }).then(async (result) => {
     const items = await prismaClient.cartItem.findMany({ where: { cartId: request.cartId }, include: { product: true } });
     const totalPrice = calculateTotalPrice(items);
 
