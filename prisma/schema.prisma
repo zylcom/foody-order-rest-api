@@ -42,6 +42,7 @@ model Product {
   id            Int             @id() @default(autoincrement())
   name          String          @db.VarChar(100)
   slug          String          @unique @db.VarChar(100)
+  image         String          @default("https://res.cloudinary.com/dk9bcf16t/image/upload/v1699505599/default_v5bzrz.jpg") @db.VarChar(255)
   price         Int
   averageRating Float?          @db.Float
   description   String?         @db.Text
