@@ -36,6 +36,17 @@ describe("POST /api/feedback", function () {
     expect(result_2.body.errors).toBeDefined();
   });
 
+  it("shoul reject if feedback description is just white space", async () => {
+    const guestUser = await request.get("/api/users/current");
+    const result_1 = await request.post("/api/feedback").query({ guest_uid: guestUser.body.data.guestUserId }).send({ description: "                " });
+    const result_2 = await request.post("/api/feedback").set("Authorization", token).send({ description: "                " });
+
+    expect(result_1.status).toBe(400);
+    expect(result_1.body.errors).toBeDefined();
+    expect(result_2.status).toBe(400);
+    expect(result_2.body.errors).toBeDefined();
+  });
+
   it("shoul reject if unauthorized", async () => {
     const result_1 = await request.post("/api/feedback").query({ guest_uid: "" }).send({ description: "This is feedback description" });
     const result_2 = await request.post("/api/feedback").set("Authorization", invalidToken).send({ description: "This is feedback description" });

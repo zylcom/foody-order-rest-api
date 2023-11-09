@@ -27,6 +27,7 @@ CREATE TABLE `products` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `slug` VARCHAR(100) NOT NULL,
+    `image` VARCHAR(255) NOT NULL DEFAULT 'https://res.cloudinary.com/dk9bcf16t/image/upload/v1699423349/default_rhnd0q.jpg',
     `price` INTEGER NOT NULL,
     `averageRating` FLOAT NULL,
     `description` TEXT NULL,
