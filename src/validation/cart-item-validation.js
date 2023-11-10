@@ -17,7 +17,11 @@ const upsertCartItemValidation = z
   .object({
     cartId: cartIdValidation,
     productSlug: z.string({ required_error: "Product slug is required!" }).nonempty({ message: "Product slug is not allowed to be empty!" }),
-    quantity: z.coerce.number({ invalid_type_error: "Quantity must be number!" }).min(1).positive({ message: "Quantity must be positive number!" }),
+    quantity: z.coerce
+      .number({ invalid_type_error: "Quantity must be number!" })
+      .int({ message: "Quantity must be an integer!" })
+      .min(1)
+      .positive({ message: "Quantity must be positive number!" }),
   })
   .strict();
 
