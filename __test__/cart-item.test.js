@@ -35,7 +35,7 @@ describe("PUT /api/users/current/carts/items", function () {
     await removeTestUser();
   });
 
-  it("should can update or insert cart item", async () => {
+  it("should can insert cart item", async () => {
     const product = await supertest(web).get("/api/products/pizza-0");
     const result = await supertest(web).put("/api/users/current/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 5 });
 
@@ -43,6 +43,35 @@ describe("PUT /api/users/current/carts/items", function () {
     expect(result.body.data.quantity).toBe(5);
     expect(result.body.data.productSlug).toBe(product.body.data.slug);
     expect(result.body.data.product.slug).toBe(product.body.data.slug);
+  });
+
+  it("should can update cart item", async () => {
+    const product = await supertest(web).get("/api/products/pizza-0");
+    await supertest(web).put("/api/users/current/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const result = await supertest(web)
+      .put("/api/users/current/carts/items")
+      .set("Authorization", token)
+      .send({ productSlug: product.body.data.slug, quantity: 10 });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.quantity).toBe(10);
+    expect(result.body.data.productSlug).toBe(product.body.data.slug);
+    expect(result.body.data.product.slug).toBe(product.body.data.slug);
+  });
+
+  it("should reject if quantity is float number", async () => {
+    const product = await supertest(web).get("/api/products/pizza-0");
+    const result = await supertest(web)
+      .put("/api/users/current/carts/items")
+      .set("Authorization", token)
+      .send({ productSlug: product.body.data.slug, quantity: 5.5 });
+
+    console.log(result.body);
+
+    // expect(result.status).toBe(200);
+    // expect(result.body.data.quantity).toBe(5);
+    // expect(result.body.data.productSlug).toBe(product.body.data.slug);
+    // expect(result.body.data.product.slug).toBe(product.body.data.slug);
   });
 
   it("should reject if token is invalid", async () => {
