@@ -66,12 +66,9 @@ describe("PUT /api/users/current/carts/items", function () {
       .set("Authorization", token)
       .send({ productSlug: product.body.data.slug, quantity: 5.5 });
 
-    console.log(result.body);
-
-    // expect(result.status).toBe(200);
-    // expect(result.body.data.quantity).toBe(5);
-    // expect(result.body.data.productSlug).toBe(product.body.data.slug);
-    // expect(result.body.data.product.slug).toBe(product.body.data.slug);
+    expect(result.status).toBe(400);
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.data).toBeUndefined();
   });
 
   it("should reject if token is invalid", async () => {
