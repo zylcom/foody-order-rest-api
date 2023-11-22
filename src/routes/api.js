@@ -13,12 +13,12 @@ userRouter.use(authMiddleware);
 userRouter.patch("/api/users/current", userController.update);
 userRouter.delete("/api/users/logout", userController.logout);
 
-userRouter.get("/api/users/current/carts", cartController.get);
+userRouter.get("/api/carts", cartController.get);
 
-userRouter.get("/api/users/current/carts/items", cartItemController.get);
-userRouter.get("/api/users/current/carts/items/:productSlug", cartItemController.find);
-userRouter.put("/api/users/current/carts/items", cartItemController.upsert);
-userRouter.delete("/api/users/current/carts/items/:productSlug", cartItemController.remove);
+userRouter.get("/api/carts/items", cartItemController.get);
+userRouter.get("/api/carts/items/:productSlug", cartItemController.find);
+userRouter.put("/api/carts/items", cartItemController.upsert);
+userRouter.delete("/api/carts/items/:productSlug", cartItemController.remove);
 
 userRouter.post("/api/products/reviews", reviewController.create);
 userRouter.put("/api/products/reviews", reviewController.update);
