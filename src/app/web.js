@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
+import path from "path";
 // import swaggerDocument from "../../docs/openapi.json";
 import swaggerUi from "swagger-ui-express";
 import { errorMiddleware } from "../middleware/error-middleware.js";
@@ -13,7 +14,7 @@ const corsOptions = {
   origin: "*",
 };
 
-const swaggerDocument = JSON.parse(fs.readFileSync("./docs/openapi.json"));
+const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "docs", "openapi.json")));
 
 web.use(cors(corsOptions));
 web.use(webhookRouter);
