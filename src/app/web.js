@@ -15,6 +15,7 @@ const corsOptions = {
 };
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "docs", "openapi.json")));
+const cssUrl = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.6.2/swagger-ui.min.css";
 
 web.use(cors(corsOptions));
 web.use(webhookRouter);
@@ -28,7 +29,7 @@ web.use(
 
     next();
   },
-  swaggerUi.serveFiles(swaggerDocument, {}),
+  swaggerUi.serveFiles(swaggerDocument, { customCssUrl: cssUrl }),
   swaggerUi.setup()
 );
 web.use(publicRouter);
