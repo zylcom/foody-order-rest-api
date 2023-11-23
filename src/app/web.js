@@ -15,6 +15,7 @@ const options = {
   swaggerOptions: {
     url: "https://gist.githubusercontent.com/zylcom/090fb0e5b523832810f7da8a9ba87f2f/raw/c0587de1830a2c965199172d997d1bf424803945/foody-order-api-spec.json",
   },
+  customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.7.0/swagger-ui.min.css",
 };
 
 web.use(cors(corsOptions));
