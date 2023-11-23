@@ -20,6 +20,7 @@
   "author": "sabilillah <sabilillah272@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "@babel/plugin-syntax-import-attributes": "^7.23.3",
     "@babel/preset-env": "^7.22.5",
     "@faker-js/faker": "^8.0.2",
     "@types/bcrypt": "^5.0.0",

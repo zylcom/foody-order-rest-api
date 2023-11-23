@@ -98,7 +98,7 @@ const infinite = async (request) => {
   request = validate(infiniteValidation, request);
 
   let products = await prismaClient.product.findMany({
-    take: request.size,
+    take: Boolean(request.cursor) ? request.size + 1 : request.size,
     cursor: request.cursor ? { id: request.cursor } : undefined,
     where: {
       name: { contains: request.name },
@@ -112,7 +112,7 @@ const infinite = async (request) => {
   });
 
   // Skip 1 product if products length more than 1
-  if (products.length > 1) {
+  if (products.length > 1 && Boolean(request.cursor)) {
     products = products.slice(1);
   }
 
