@@ -12,7 +12,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should can create new order as authenticated user", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const result = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -46,7 +46,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const result = await request
       .post("/api/orders")
       .set("Authorization", "invalid-token")
@@ -78,7 +78,7 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should can checkout order as authenticated user", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -110,7 +110,7 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -123,7 +123,7 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should return old session if not expired", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -148,7 +148,7 @@ describe("GET /api/orders/:orderId", function () {
   });
 
   it("should can get order as authenticated user", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -201,7 +201,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should can cancel order as authenticated user", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -235,7 +235,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", token);
     const order = await request
       .post("/api/orders")
       .set("Authorization", token)
@@ -254,8 +254,8 @@ describe("POST /api/orders/:orderId/cancel", function () {
       .send({ username: "test-order", name: "Test Order", password: "rahasia123", phonenumberForm: { number: "+6288293106563", countryId: "ID" } });
     const authUser = await request.post("/api/users/login").send({ username: user.body.data.username, password: "rahasia123" });
     const product = await request.get("/api/products/pizza-0");
-    await request.put("/api/users/current/carts/items").set("Authorization", authUser.body.data.token).send({ productSlug: product.body.data.slug, quantity: 5 });
-    const cart = await request.get("/api/users/current/carts").set("Authorization", token);
+    await request.put("/api/carts/items").set("Authorization", authUser.body.data.token).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const cart = await request.get("/api/carts").set("Authorization", token);
 
     const order = await request
       .post("/api/orders")

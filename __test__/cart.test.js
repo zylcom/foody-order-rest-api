@@ -2,7 +2,7 @@ import { createTestUser, removeTestUser, token } from "./test-util";
 import { calculateTotalPrice } from "../src/utils";
 import { request } from "./setup";
 
-describe("GET /api/users/current/carts", function () {
+describe("GET /api/carts", function () {
   beforeEach(async () => {
     await createTestUser();
   });
@@ -12,7 +12,7 @@ describe("GET /api/users/current/carts", function () {
   });
 
   it("should can get the cart current user", async () => {
-    const result = await request.get("/api/users/current/carts").set("Authorization", token);
+    const result = await request.get("/api/carts").set("Authorization", token);
 
     expect(result.body.data.cartItems).toBeDefined();
     expect(result.body.data.cartItems.length).toBeGreaterThan(0);
@@ -20,7 +20,7 @@ describe("GET /api/users/current/carts", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await request.get("/api/users/current/carts").set("Authorization", "invalid-token");
+    const result = await request.get("/api/carts").set("Authorization", "invalid-token");
 
     expect(result.body.errors).toBeDefined();
     expect(result.body.data).toBeUndefined();
