@@ -1,8 +1,5 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
-// import swaggerDocument from "../../docs/openapi.json";
 import swaggerUi from "swagger-ui-express";
 import { errorMiddleware } from "../middleware/error-middleware.js";
 import { publicRouter } from "../routes/public-api.js";
@@ -14,24 +11,17 @@ const corsOptions = {
   origin: "*",
 };
 
-const swaggerDocument = JSON.parse(fs.readFileSync(path.join(process.cwd(), "docs", "openapi.json")));
-const cssUrl = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.6.2/swagger-ui.min.css";
+const options = {
+  swaggerOptions: {
+    url: "https://gist.githubusercontent.com/zylcom/090fb0e5b523832810f7da8a9ba87f2f/raw/c0587de1830a2c965199172d997d1bf424803945/foody-order-api-spec.json",
+  },
+  customCssUrl: "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.6.2/swagger-ui.min.css",
+};
 
 web.use(cors(corsOptions));
 web.use(webhookRouter);
 web.use(express.json());
-web.use(
-  "/api/docs",
-  function (req, res, next) {
-    swaggerDocument.servers = [{ url: `http://${req.get("host")}/api` }];
-
-    req.swaggerDoc = swaggerDocument;
-
-    next();
-  },
-  swaggerUi.serveFiles(swaggerDocument, { customCssUrl: cssUrl }),
-  swaggerUi.setup()
-);
+web.use("/api/docs", swaggerUi.serve, swaggerUi.setup(null, options));
 web.use(publicRouter);
 web.use(userRouter);
 web.use(errorMiddleware);
