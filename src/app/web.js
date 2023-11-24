@@ -1,32 +1,29 @@
 import express from "express";
 import cors from "cors";
-import swaggerDocument from "../../docs/openapi.json" assert { type: "json" };
 import swaggerUi from "swagger-ui-express";
 import { errorMiddleware } from "../middleware/error-middleware.js";
 import { publicRouter } from "../routes/public-api.js";
 import { userRouter } from "../routes/api.js";
 import { webhookRouter } from "../routes/webhook.js";
+import path from "path";
 
 export const web = express();
 const corsOptions = {
   origin: "*",
 };
 
+const options = {
+  swaggerOptions: {
+    url: "/api-docs/api-spec.json",
+  },
+  customCssUrl: "/api-docs/swagger-ui.css",
+};
+
 web.use(cors(corsOptions));
 web.use(webhookRouter);
 web.use(express.json());
-web.use(
-  "/api/docs",
-  function (req, res, next) {
-    swaggerDocument.servers = [{ url: `http://${req.get("host")}/api` }];
-
-    req.swaggerDoc = swaggerDocument;
-
-    next();
-  },
-  swaggerUi.serveFiles(swaggerDocument, {}),
-  swaggerUi.setup()
-);
+web.use(express.static(path.resolve("./public")));
+web.use("/api/docs", express.static("node_modules/swagger-ui-dist/", { index: false }), swaggerUi.serve, swaggerUi.setup(null, options));
 web.use(publicRouter);
 web.use(userRouter);
 web.use(errorMiddleware);
