@@ -14,7 +14,7 @@ const corsOptions = {
 
 const options = {
   swaggerOptions: {
-    url: "https://gist.githubusercontent.com/zylcom/090fb0e5b523832810f7da8a9ba87f2f/raw/c0587de1830a2c965199172d997d1bf424803945/foody-order-api-spec.json",
+    url: "/api-docs/api-spec.json",
   },
   customCssUrl: "/api-docs/swagger-ui.css",
 };

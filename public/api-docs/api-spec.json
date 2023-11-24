@@ -36,7 +36,7 @@
     }
   ],
   "paths": {
-    "/users": {
+    "/api/users": {
       "post": {
         "tags": ["users"],
         "summary": "Register new user",
@@ -115,7 +115,7 @@
         }
       }
     },
-    "/users/current": {
+    "/api/users/current": {
       "get": {
         "tags": ["users"],
         "summary": "Get data of login user. If not logged in then create guest user id.",
@@ -225,7 +225,7 @@
         }
       }
     },
-    "/users/login": {
+    "/api/users/login": {
       "post": {
         "tags": ["users"],
         "summary": "Login user",
@@ -258,12 +258,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "token": {
-                      "type": "string",
-                      "example": "bdec92c0-9ee4-4aa6-857e-e713cff51179"
-                    },
                     "data": {
-                      "$ref": "#/components/schemas/User"
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "bdec92c0-9ee4-4aa6-857e-e713cff51179"
+                        }
+                      }
                     }
                   }
                 }
@@ -289,7 +291,7 @@
         }
       }
     },
-    "/users/logout": {
+    "/api/users/logout": {
       "delete": {
         "tags": ["users"],
         "summary": "Logout user",
@@ -326,7 +328,7 @@
         }
       }
     },
-    "/carts": {
+    "/api/carts": {
       "get": {
         "tags": ["carts"],
         "summary": "Get cart data",
@@ -358,7 +360,7 @@
         }
       }
     },
-    "/carts/items": {
+    "/api/carts/items": {
       "get": {
         "tags": ["carts"],
         "summary": "Get cart items",
@@ -489,7 +491,7 @@
         }
       }
     },
-    "/carts/items/{productSlug}": {
+    "/api/carts/items/{productSlug}": {
       "get": {
         "tags": ["carts"],
         "security": [{ "tokenAuth": [] }],
@@ -585,7 +587,7 @@
         }
       }
     },
-    "/products": {
+    "/api/products": {
       "get": {
         "tags": ["products"],
         "summary": "Get collections of products",
@@ -686,7 +688,7 @@
         }
       }
     },
-    "/products/search": {
+    "/api/products/search": {
       "get": {
         "tags": ["products"],
         "summary": "Search products",
@@ -729,7 +731,7 @@
         }
       }
     },
-    "/products/{productSlug}/like": {
+    "/api/products/{productSlug}/like": {
       "post": {
         "tags": ["products"],
         "summary": "Like specific product",
@@ -889,7 +891,7 @@
         }
       }
     },
-    "/products/reviews": {
+    "/api/products/reviews": {
       "post": {
         "tags": ["reviews"],
         "security": [{ "tokenAuth": [] }],
