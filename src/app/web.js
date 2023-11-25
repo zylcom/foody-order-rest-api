@@ -14,7 +14,7 @@ const corsOptions = {
   origin: "*",
 };
 
-const file = fs.readFileSync("./src/docs/api-spec.yaml", "utf8");
+const file = fs.readFileSync(path.join(process.cwd(), "src", "docs", "api-spec.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
 
 const options = {
