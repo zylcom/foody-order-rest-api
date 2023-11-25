@@ -25,7 +25,11 @@ const get = async (req, res, next) => {
     const token = req.get("Authorization");
     const result = await userService.get(token);
 
-    res.status(200).set("Cache-Control", "private, max-age=3, must-revalidate").json({ data: result });
+    if (result.guestUserId) {
+      res.status(201).set("Cache-Control", "private, max-age=3, must-revalidate").json({ data: result });
+    } else {
+      res.status(200).set("Cache-Control", "private, max-age=3, must-revalidate").json({ data: result });
+    }
   } catch (error) {
     next(error);
   }

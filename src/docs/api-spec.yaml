@@ -50,13 +50,13 @@ paths:
                   properties:
                     number:
                       type: string
-                      example: '+6283806163238'
+                      example: "+6283806163238"
                     countryId:
                       type: string
                       example: ID
         required: true
       responses:
-        '201':
+        "201":
           description: User created
           content:
             application/json:
@@ -66,24 +66,30 @@ paths:
                   data:
                     type: object
                     allOf:
-                      - $ref: '#/components/schemas/User'
+                      - $ref: "#/components/schemas/User"
                       - properties:
                           token:
                             type: string
                             example: 6429c8d9-2dee-4677-9364-9aca60a303d0
-        '400':
+                          cart:
+                            $ref: "#/components/schemas/Cart"
+        "400":
           description: Validation exception
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationExceptionError'
-        '409':
+                $ref: "#/components/schemas/ValidationExceptionError"
+              example:
+                errors: "Your password must be at least 8 characters."
+        "409":
           description: Username already used
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationExceptionError'
-        '500':
+                $ref: "#/components/schemas/ValidationExceptionError"
+              example:
+                errors: "Another user with this username already exist."
+        "500":
           description: Internal server error
           content:
             application/json:
@@ -99,18 +105,18 @@ paths:
         - users
       summary: Get data of login user. If not logged in then create guest user id.
       responses:
-        '200':
-          description: Get data of current user successfully
+        "200":
+          description: Data of logged user
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/User'
+                  - $ref: "#/components/schemas/User"
                   - properties:
                       cart:
-                        $ref: '#/components/schemas/Cart'
-        '201':
-          description: Create guest user successfully
+                        $ref: "#/components/schemas/Cart"
+        "201":
+          description: Created guest user
           content:
             application/json:
               schema:
@@ -122,12 +128,20 @@ paths:
                       guestUserId:
                         type: string
                         example: 6429c8d9-2dee-4677-9364-9aca60a303d0
-        '401':
+        "400":
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationExceptionError"
+              example:
+                errors: "Token is invalid"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
     patch:
       tags:
         - users
@@ -151,18 +165,18 @@ paths:
                   minLength: 8
                   maxLength: 32
       responses:
-        '200':
+        "200":
           description: Update user successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '401':
+                $ref: "#/components/schemas/User"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /api/users/login:
     post:
       tags:
@@ -183,7 +197,7 @@ paths:
                   type: string
                   example: rahasia123
       responses:
-        '200':
+        "200":
           description: Login successfully
           content:
             application/json:
@@ -196,7 +210,7 @@ paths:
                       token:
                         type: string
                         example: bdec92c0-9ee4-4aa6-857e-e713cff51179
-        '401':
+        "401":
           description: Login fail
           content:
             application/json:
@@ -214,7 +228,7 @@ paths:
       security:
         - tokenAuth: []
       responses:
-        '200':
+        "200":
           description: Logout successfully
           content:
             application/json:
@@ -224,12 +238,12 @@ paths:
                   data:
                     type: string
                     example: Logged out
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /api/carts:
     get:
       tags:
@@ -238,7 +252,7 @@ paths:
       security:
         - tokenAuth: []
       responses:
-        '200':
+        "200":
           description: Get cart data successfully
           content:
             application/json:
@@ -246,13 +260,13 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Cart'
-        '401':
+                    $ref: "#/components/schemas/Cart"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /api/carts/items:
     get:
       tags:
@@ -261,7 +275,7 @@ paths:
       security:
         - tokenAuth: []
       responses:
-        '200':
+        "200":
           description: Get cart items successfully
           content:
             application/json:
@@ -271,13 +285,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Item'
-        '401':
+                      $ref: "#/components/schemas/Item"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
     put:
       tags:
         - carts
@@ -303,7 +317,7 @@ paths:
                   maxLength: 50
                   minLength: 3
       responses:
-        '200':
+        "200":
           description: Update or insert item successfully
           content:
             application/json:
@@ -313,12 +327,12 @@ paths:
                   data:
                     type: object
                     allOf:
-                      - $ref: '#/components/schemas/Item'
+                      - $ref: "#/components/schemas/Item"
                       - type: object
                         properties:
                           product:
-                            $ref: '#/components/schemas/Product'
-        '400':
+                            $ref: "#/components/schemas/Product"
+        "400":
           description: Validation exception
           content:
             application/json:
@@ -330,13 +344,13 @@ paths:
                     example: >-
                       Number must be greater than or equal to 1, Quantity must
                       be positive number!
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
           description: Product not found
           content:
             application/json:
@@ -363,19 +377,19 @@ paths:
             maxLength: 50
             example: pizza
       responses:
-        '200':
+        "200":
           description: Get item successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Item'
-        '401':
+                $ref: "#/components/schemas/Item"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
           description: Product item not found
           content:
             application/json:
@@ -401,7 +415,7 @@ paths:
             maxLength: 50
             example: pizza
       responses:
-        '200':
+        "200":
           description: Delete item successfully
           content:
             application/json:
@@ -411,13 +425,13 @@ paths:
                   data:
                     type: string
                     example: Cart item deleted
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
           description: Product item not found
           content:
             application/json:
@@ -486,7 +500,7 @@ paths:
             format: int32
       security: []
       responses:
-        '200':
+        "200":
           description: Get collections of products successfully
           content:
             application/json:
@@ -497,13 +511,13 @@ paths:
                     type: array
                     items:
                       allOf:
-                        - $ref: '#/components/schemas/Product'
+                        - $ref: "#/components/schemas/Product"
                         - type: object
                           properties:
                             likes:
-                              $ref: '#/components/schemas/Like'
+                              $ref: "#/components/schemas/Like"
                   paging:
-                    $ref: '#/components/schemas/Paging'
+                    $ref: "#/components/schemas/Paging"
   /api/products/search:
     get:
       tags:
@@ -525,14 +539,14 @@ paths:
             type: string
             example: food
       responses:
-        '200':
+        "200":
           description: Search product successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
+                  $ref: "#/components/schemas/Product"
   /api/products/{productSlug}/like:
     post:
       tags:
@@ -549,7 +563,7 @@ paths:
             type: string
             example: pizza
       responses:
-        '200':
+        "200":
           description: Like product successfully
           content:
             application/json:
@@ -557,8 +571,8 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Like'
-        '400':
+                    $ref: "#/components/schemas/Like"
+        "400":
           description: User already liked this product
           content:
             application/json:
@@ -568,13 +582,13 @@ paths:
                   errors:
                     type: string
                     example: Product is already liked!
-        '401':
+        "401":
           description: Token invalid or not provided
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
           description: Product not found
           content:
             application/json:
@@ -601,7 +615,7 @@ paths:
             maxLength: 50
             minLength: 1
       responses:
-        '200':
+        "200":
           description: Neutralize like product successfully
           content:
             application/json:
@@ -609,8 +623,8 @@ paths:
                 type: object
                 properties:
                   data:
-                    $ref: '#/components/schemas/Like'
-        '400':
+                    $ref: "#/components/schemas/Like"
+        "400":
           description: User not liked this product
           content:
             application/json:
@@ -620,13 +634,13 @@ paths:
                   errors:
                     type: string
                     example: Product is not liked!
-        '401':
+        "401":
           description: Token is empty or invalid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
-        '404':
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
           description: Product not found
           content:
             application/json:
@@ -662,18 +676,18 @@ paths:
                   type: string
                   example: pizza
       responses:
-        '200':
+        "200":
           description: Create review successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Review'
-        '401':
+                $ref: "#/components/schemas/Review"
+        "401":
           description: Token invalid or not provided
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
     put:
       tags:
         - reviews
@@ -701,17 +715,17 @@ paths:
                   example: pizza
                   maxLength: 50
       responses:
-        '200':
+        "200":
           description: Update review successfully
           content:
             application/json:
               schema: {}
-        '401':
+        "401":
           description: Token invalid or not provided
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnauthorizedResponse'
+                $ref: "#/components/schemas/UnauthorizedResponse"
 components:
   schemas:
     Cart:
@@ -728,10 +742,10 @@ components:
           example: 100000
         createdAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         updatedAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         cartItems:
           type: array
           items:
@@ -769,10 +783,10 @@ components:
           example: 10
         createdAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         updatedAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
     Paging:
       type: object
       properties:
@@ -822,20 +836,23 @@ components:
           example: food
         createdAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         updatedAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
     Profile:
       type: object
       properties:
         name:
           type: string
+          example: Zylcom
         address:
           type: string
           nullable: true
+          example: null
         avatar:
           type: string
+          example: "avatar-default.jpg"
     Like:
       type: object
       properties:
@@ -850,10 +867,10 @@ components:
           example: zylcom
         createdAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         updatedAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
     Review:
       type: object
       properties:
@@ -876,21 +893,26 @@ components:
           example: 5
         createdAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         updatedAt:
           type: string
-          example: '2023-11-10T08:09:53.865Z'
+          example: "2023-11-10T08:09:53.865Z"
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
     User:
       type: object
       properties:
+        id:
+          type: integer
+          example: 1
         username:
           type: string
+          example: zylcom
         phonenumber:
           type: string
+          example: "+6281234567890"
         profile:
-          $ref: '#/components/schemas/Profile'
+          $ref: "#/components/schemas/Profile"
     UnauthorizedResponse:
       type: object
       properties:

@@ -28,11 +28,12 @@ const register = async (request) => {
       cart: { create: {} },
     },
     select: {
+      id: true,
       username: true,
       phonenumber: true,
       token: true,
       profile: { select: { name: true, address: true, avatar: true } },
-      cart: { select: { cartItems: true } },
+      cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
     },
   });
 };
@@ -70,12 +71,12 @@ const get = async (token) => {
         username: true,
         phonenumber: true,
         profile: { select: { address: true, avatar: true, name: true } },
-        cart: { select: { cartItems: { include: { product: true } } } },
+        cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
       },
     });
 
     if (!user) {
-      throw new ResponseError(404, "User not found!");
+      throw new ResponseError(401, "Unauthorized!");
     }
 
     return user;
