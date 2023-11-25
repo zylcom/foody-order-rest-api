@@ -42,7 +42,16 @@ const userData = z
 
 const registerUserValidation = userData.required({ name: true, username: true, password: true, phonenumberForm: true });
 
-const loginUserValidation = userData.required({ username: true, password: true });
+const loginUserValidation = z
+  .object({
+    username: z
+      .string({ invalid_type_error: "Username must be a string!", required_error: "Username is required!" })
+      .min(1, { message: "Username is not allowed to be empty." }),
+    password: z
+      .string({ invalid_type_error: "Password must be a string!", required_error: "Password is required!" })
+      .min(1, { message: "Password is not allowed to be empty." }),
+  })
+  .strict();
 
 const getUserValidation = z
   .string({ invalid_type_error: "Token must be a string!", required_error: "Token is required!" })

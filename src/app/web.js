@@ -24,13 +24,6 @@ const options = {
 web.use(cors(corsOptions));
 web.use(webhookRouter);
 web.use(express.json());
-web.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
-    return res.status(400).send({ errors: "Invalid request body. Please send valid JSON!" });
-  }
-
-  next();
-});
 web.use(express.static(path.resolve("./public")));
 web.use("/api/docs", express.static("node_modules/swagger-ui-dist/", { index: false }), swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 web.use(publicRouter);

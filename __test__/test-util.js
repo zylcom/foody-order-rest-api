@@ -4,7 +4,7 @@ import { calculateTotalPrice } from "../src/utils";
 
 const username = "test-user";
 const name = "Test User";
-const password = "rahasia";
+const password = "rahasia123";
 const phonenumberForm = { number: "+6283806163238", countryId: "ID" };
 const token = "1fef98b8-55e9-424d-a0be-799a01e9881d";
 const invalidToken = "1fef98b8-442d-4edb-be95-799a01e9881d";

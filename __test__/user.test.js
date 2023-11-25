@@ -11,7 +11,7 @@ describe("POST /api/users", function () {
   it("should can register new user", async () => {
     const result = await request.post("/api/users").send({ username, name, password, phonenumberForm });
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(201);
     expect(result.body.data.username).toBe(username);
     expect(result.body.data.profile.name).toBe(name);
     expect(result.body.data.phonenumber).toBe(phonenumberForm.number);
@@ -23,7 +23,7 @@ describe("POST /api/users", function () {
   it("should reject if username already registered", async () => {
     let result = await request.post("/api/users").send({ username, name, password, phonenumberForm });
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(201);
     expect(result.body.data.username).toBe(username);
     expect(result.body.data.profile.name).toBe(name);
     expect(result.body.data.phonenumber).toBe(phonenumberForm.number);
@@ -33,7 +33,7 @@ describe("POST /api/users", function () {
 
     result = await request.post("/api/users").send({ username, name, password, phonenumberForm });
 
-    expect(result.status).toBe(400);
+    expect(result.status).toBe(409);
     expect(result.body.errors).toBeDefined();
   });
 
@@ -80,6 +80,8 @@ describe("POST /api/users/login", function () {
 
   it("should reject if password is invalid", async () => {
     const result = await request.post("/api/users/login").send({ username, password: "asal" });
+
+    console.log(result.body);
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
