@@ -1,0 +1,909 @@
+openapi: 3.0.3
+info:
+  title: Foody Order RESTful API - OpenAPI 3.0
+  description: This is a simple food ordering app API.
+  contact:
+    email: sabilillah272@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+security:
+  - tokenAuth: []
+tags:
+  - name: users
+    description: Operation about user
+  - name: products
+    description: Everything about product
+  - name: carts
+    description: Operation about cart
+  - name: reviews
+    description: Operation about review
+paths:
+  /api/users:
+    post:
+      tags:
+        - users
+      summary: Register new user
+      security: []
+      requestBody:
+        description: Data of new user
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                username:
+                  type: string
+                  example: zylcom
+                name:
+                  type: string
+                  example: Zylcom
+                password:
+                  type: string
+                  format: password
+                  example: rahasia123
+                phonenumberForm:
+                  type: object
+                  additionalProperties: false
+                  properties:
+                    number:
+                      type: string
+                      example: '+6283806163238'
+                    countryId:
+                      type: string
+                      example: ID
+        required: true
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    allOf:
+                      - $ref: '#/components/schemas/User'
+                      - properties:
+                          token:
+                            type: string
+                            example: 6429c8d9-2dee-4677-9364-9aca60a303d0
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationExceptionError'
+        '409':
+          description: Username already used
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationExceptionError'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Error message.
+  /api/users/current:
+    get:
+      tags:
+        - users
+      summary: Get data of login user. If not logged in then create guest user id.
+      responses:
+        '200':
+          description: Get data of current user successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/User'
+                  - properties:
+                      cart:
+                        $ref: '#/components/schemas/Cart'
+        '201':
+          description: Create guest user successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      guestUserId:
+                        type: string
+                        example: 6429c8d9-2dee-4677-9364-9aca60a303d0
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+    patch:
+      tags:
+        - users
+      summary: Update current user data
+      security:
+        - tokenAuth: []
+      requestBody:
+        description: New data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: New Name
+                  maxLength: 100
+                password:
+                  type: string
+                  example: new password
+                  minLength: 8
+                  maxLength: 32
+      responses:
+        '200':
+          description: Update user successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+  /api/users/login:
+    post:
+      tags:
+        - users
+      summary: Login user
+      security: []
+      requestBody:
+        description: User credential
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: zylcom
+                password:
+                  type: string
+                  example: rahasia123
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: bdec92c0-9ee4-4aa6-857e-e713cff51179
+        '401':
+          description: Login fail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Username or password invalid!
+  /api/users/logout:
+    delete:
+      tags:
+        - users
+      summary: Logout user
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: Logout successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Logged out
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+  /api/carts:
+    get:
+      tags:
+        - carts
+      summary: Get cart data
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: Get cart data successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cart'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+  /api/carts/items:
+    get:
+      tags:
+        - carts
+      summary: Get cart items
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: Get cart items successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Item'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+    put:
+      tags:
+        - carts
+      summary: Update or insert item to cart
+      security:
+        - tokenAuth: []
+      requestBody:
+        description: Item information
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  format: int32
+                  example: 15
+                  minimum: 1
+                  maximum: 999
+                productSlug:
+                  type: string
+                  example: pizza
+                  maxLength: 50
+                  minLength: 3
+      responses:
+        '200':
+          description: Update or insert item successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    allOf:
+                      - $ref: '#/components/schemas/Item'
+                      - type: object
+                        properties:
+                          product:
+                            $ref: '#/components/schemas/Product'
+        '400':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: >-
+                      Number must be greater than or equal to 1, Quantity must
+                      be positive number!
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Product not found!
+  /api/carts/items/{productSlug}:
+    get:
+      tags:
+        - carts
+      security:
+        - tokenAuth: []
+      summary: Get cart item by product slug
+      parameters:
+        - required: true
+          name: productSlug
+          in: path
+          description: Product slug
+          schema:
+            type: string
+            maxLength: 50
+            example: pizza
+      responses:
+        '200':
+          description: Get item successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '404':
+          description: Product item not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Item not found!
+    delete:
+      tags:
+        - carts
+      security:
+        - tokenAuth: []
+      summary: Remove item from cart
+      parameters:
+        - required: true
+          name: productSlug
+          in: path
+          description: Product slug
+          schema:
+            type: string
+            maxLength: 50
+            example: pizza
+      responses:
+        '200':
+          description: Delete item successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: Cart item deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '404':
+          description: Product item not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Cart item not found!
+  /api/products:
+    get:
+      tags:
+        - products
+      summary: Get collections of products
+      parameters:
+        - name: name
+          allowEmptyValue: true
+          description: Name of product.
+          in: query
+          required: false
+          schema:
+            type: string
+            example: cappuccino
+            pattern: ^[a-zA-Z0-9]
+            maxLength: 50
+        - name: tag
+          allowEmptyValue: true
+          description: Tag of product.
+          in: query
+          required: false
+          schema:
+            type: string
+            example: coffee
+            pattern: ^[a-zA-Z0-9]
+            maxLength: 50
+        - name: category
+          allowEmptyValue: true
+          description: Category of product.
+          in: query
+          required: false
+          schema:
+            type: string
+            example: drink
+            pattern: ^[a-zA-Z0-9]
+            maxLength: 50
+        - name: size
+          allowEmptyValue: false
+          description: Length of data taken.
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 5
+            minimum: 1
+            format: int32
+            maximum: 100
+        - name: cursor
+          allowEmptyValue: false
+          description: Cursor is product id.
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+            minimum: 1
+            format: int32
+      security: []
+      responses:
+        '200':
+          description: Get collections of products successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Product'
+                        - type: object
+                          properties:
+                            likes:
+                              $ref: '#/components/schemas/Like'
+                  paging:
+                    $ref: '#/components/schemas/Paging'
+  /api/products/search:
+    get:
+      tags:
+        - products
+      summary: Search products
+      parameters:
+        - name: title
+          in: query
+          description: Product title
+          required: false
+          schema:
+            type: string
+            example: pizza
+        - name: category
+          in: query
+          description: Product category name
+          required: false
+          schema:
+            type: string
+            example: food
+      responses:
+        '200':
+          description: Search product successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+  /api/products/{productSlug}/like:
+    post:
+      tags:
+        - products
+      summary: Like specific product
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: productSlug
+          in: path
+          description: The product slug
+          required: true
+          schema:
+            type: string
+            example: pizza
+      responses:
+        '200':
+          description: Like product successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Like'
+        '400':
+          description: User already liked this product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Product is already liked!
+        '401':
+          description: Token invalid or not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Product not found!
+    delete:
+      tags:
+        - products
+      summary: Neutralize like specific product
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: productSlug
+          in: path
+          description: The product slug
+          required: true
+          schema:
+            type: string
+            example: pizza
+            maxLength: 50
+            minLength: 1
+      responses:
+        '200':
+          description: Neutralize like product successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Like'
+        '400':
+          description: User not liked this product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Product is not liked!
+        '401':
+          description: Token is empty or invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: string
+                    example: Product not found!
+  /api/products/reviews:
+    post:
+      tags:
+        - reviews
+      security:
+        - tokenAuth: []
+      summary: Create new review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Delicious food :)
+                rating:
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                productSlug:
+                  type: string
+                  example: pizza
+      responses:
+        '200':
+          description: Create review successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '401':
+          description: Token invalid or not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+    put:
+      tags:
+        - reviews
+      security:
+        - tokenAuth: []
+      summary: Update review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Not good anymore
+                  maxLength: 500
+                rating:
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 5
+                  example: 1
+                productSlug:
+                  type: string
+                  example: pizza
+                  maxLength: 50
+      responses:
+        '200':
+          description: Update review successfully
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Token invalid or not provided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: zylcom
+        totalPrice:
+          type: integer
+          example: 100000
+        createdAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        updatedAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        cartItems:
+          type: array
+          items:
+            type: object
+          example: []
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Food
+        slug:
+          type: string
+          example: food
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        cartId:
+          type: integer
+          format: int32
+          example: 1
+        productSlug:
+          type: string
+          example: pizza
+        quantity:
+          type: integer
+          format: int32
+          example: 10
+        createdAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        updatedAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+    Paging:
+      type: object
+      properties:
+        nextCursor:
+          type: integer
+          format: int32
+          example: 6
+        totalProducts:
+          type: number
+          example: 30
+        totalPage:
+          type: number
+          example: 7
+        hasNextPage:
+          type: boolean
+          example: false
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Pizza
+        slug:
+          type: string
+          example: pizza
+        price:
+          type: integer
+          example: 10000
+        image:
+          type: string
+          example: >-
+            https://res.cloudinary.com/dk9bcf16t/image/upload/v1699505606/pizza_t24lbe.jpg
+        averageRating:
+          type: number
+          example: 2.7
+        description:
+          type: string
+          example: It's popular for all the right reasons.
+        ingredients:
+          type: string
+          example: Wheat flour, tomato, cheese.
+        categorySlug:
+          type: string
+          example: food
+        createdAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        updatedAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+    Profile:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+          nullable: true
+        avatar:
+          type: string
+    Like:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        productSlug:
+          type: string
+          example: pizza
+        username:
+          type: string
+          example: zylcom
+        createdAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        updatedAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        productSlug:
+          type: string
+          example: pizza
+        username:
+          type: string
+          example: zylcom
+        description:
+          type: string
+          example: Delicious food :)
+        rating:
+          type: integer
+          format: int32
+          example: 5
+        createdAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        updatedAt:
+          type: string
+          example: '2023-11-10T08:09:53.865Z'
+        user:
+          $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        phonenumber:
+          type: string
+        profile:
+          $ref: '#/components/schemas/Profile'
+    UnauthorizedResponse:
+      type: object
+      properties:
+        errors:
+          type: string
+          example: Unauthorized!
+    ValidationExceptionError:
+      type: object
+      properties:
+        errors:
+          type: string
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      name: Authorization
+      in: header
