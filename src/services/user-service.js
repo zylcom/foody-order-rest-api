@@ -11,7 +11,7 @@ const register = async (request) => {
   const countUser = await prismaClient.user.count({ where: { username: user.username } });
 
   if (countUser > 0) {
-    throw new ResponseError(400, "User already exist!");
+    throw new ResponseError(409, "Another user with this username already exist.");
   }
 
   user.password = await bcrypt.hash(user.password, 10);
