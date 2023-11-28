@@ -52,7 +52,8 @@ jobs:
           DATABASE_URL: mysql://root:root@localhost:3306/food_app?connection_limit=5&pool_timeout=0
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
-          FRONT_END_BASE_URL: http://localhost:5173
+          FRONT_END_BASE_URL: ${{ vars.FRONT_END_BASE_URL }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           npx prisma migrate deploy
           npm test
