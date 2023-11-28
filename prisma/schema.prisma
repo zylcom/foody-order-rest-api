@@ -17,7 +17,6 @@ model User {
   username    String          @unique @db.VarChar(100)
   phonenumber String          @db.VarChar(100)
   password    String          @db.VarChar(100)
-  token       String?         @db.VarChar(100)
   profile     Profile?
   cart        Cart?
   reviews     Review[]

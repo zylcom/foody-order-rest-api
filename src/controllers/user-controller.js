@@ -22,7 +22,7 @@ const login = async (req, res, next) => {
 
 const get = async (req, res, next) => {
   try {
-    const token = req.get("Authorization");
+    const token = req.headers.authorization?.split(" ")[1];
     const result = await userService.get(token);
 
     if (result.guestUserId) {

@@ -1,9 +1,13 @@
 import { request } from "./setup";
-import { createTestUser, invalidToken, removeTestUser, token } from "./test-util";
+import { createTestUser, invalidToken, password, removeTestUser, username } from "./test-util";
 
 describe("POST /api/feedback", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -19,7 +23,7 @@ describe("POST /api/feedback", function () {
   });
 
   it("should can create feedback as authenticated user", async () => {
-    const result = await request.post("/api/feedback").set("Authorization", token).send({ description: "This is feedback description" });
+    const result = await request.post("/api/feedback").set("Authorization", `Bearer ${token}`).send({ description: "This is feedback description" });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBe("Feedback sent");
@@ -28,7 +32,7 @@ describe("POST /api/feedback", function () {
   it("shoul reject if feedback description is empty", async () => {
     const guestUser = await request.get("/api/users/current");
     const result_1 = await request.post("/api/feedback").query({ guest_uid: guestUser.body.data.guestUserId }).send({ description: "" });
-    const result_2 = await request.post("/api/feedback").set("Authorization", token).send({ description: "" });
+    const result_2 = await request.post("/api/feedback").set("Authorization", `Bearer ${token}`).send({ description: "" });
 
     expect(result_1.status).toBe(400);
     expect(result_1.body.errors).toBeDefined();
@@ -39,7 +43,7 @@ describe("POST /api/feedback", function () {
   it("shoul reject if feedback description is just white space", async () => {
     const guestUser = await request.get("/api/users/current");
     const result_1 = await request.post("/api/feedback").query({ guest_uid: guestUser.body.data.guestUserId }).send({ description: "                " });
-    const result_2 = await request.post("/api/feedback").set("Authorization", token).send({ description: "                " });
+    const result_2 = await request.post("/api/feedback").set("Authorization", `Bearer ${token}`).send({ description: "                " });
 
     expect(result_1.status).toBe(400);
     expect(result_1.body.errors).toBeDefined();

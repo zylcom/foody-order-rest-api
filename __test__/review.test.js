@@ -1,9 +1,12 @@
-import supertest from "supertest";
-import { web } from "../src/app/web";
-import { createTestUser, name, phonenumberForm, removeTestReview, removeTestUser, token, username } from "./test-util";
+import { createTestUser, name, password, phonenumberForm, removeTestReview, removeTestUser, username } from "./test-util";
+import { request } from "./setup";
+
+let token;
 
 beforeAll(async () => {
   await createTestUser();
+
+  token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
 });
 
 afterAll(async () => {
@@ -16,14 +19,14 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should can create new review", async () => {
-    const result = await supertest(web)
+    const result = await request
       .post("/api/products/reviews")
       .send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" })
-      .set("Authorization", token);
+      .set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
 
-    const product = await supertest(web).get(`/api/products/${result.body.data.productSlug}`);
+    const product = await request.get(`/api/products/${result.body.data.productSlug}`);
 
     expect(result.body.data.productSlug).toBe(product.body.data.slug);
     expect(result.body.data.rating).toBe(5);
@@ -34,11 +37,11 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should can create new review without description", async () => {
-    const result = await supertest(web).post("/api/products/reviews").send({ rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    const result = await request.post("/api/products/reviews").send({ rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
 
-    const product = await supertest(web).get(`/api/products/${result.body.data.productSlug}`);
+    const product = await request.get(`/api/products/${result.body.data.productSlug}`);
 
     expect(result.body.data.productSlug).toBe(product.body.data.slug);
     expect(result.body.data.rating).toBe(5);
@@ -46,12 +49,12 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should reject if review already exist", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web)
+    const result = await request
       .post("/api/products/reviews")
       .send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" })
-      .set("Authorization", token);
+      .set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -59,7 +62,7 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await supertest(web)
+    const result = await request
       .post("/api/products/reviews")
       .send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" })
       .set("Authorization", "invalid-token");
@@ -70,7 +73,7 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should reject if request is invalid", async () => {
-    const result = await supertest(web).post("/api/products/reviews").send({}).set("Authorization", token);
+    const result = await request.post("/api/products/reviews").send({}).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -78,10 +81,10 @@ describe("POST /api/products/reviews", function () {
   });
 
   it("should reject if product slug is invalid", async () => {
-    const result = await supertest(web)
+    const result = await request
       .post("/api/products/reviews")
       .send({ description: "Wailah enak", rating: 5, productSlug: "pizza-404" })
-      .set("Authorization", token);
+      .set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
@@ -95,10 +98,13 @@ describe("PUT /api/products/reviews", function () {
   });
 
   it("should can update review", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web).put("/api/products/reviews").send({ rating: 2, description: "Huueeek", productSlug: "pizza-1" }).set("Authorization", token);
-    const product = await supertest(web).get("/api/products/pizza-1");
+    const result = await request
+      .put("/api/products/reviews")
+      .send({ rating: 2, description: "Huueeek", productSlug: "pizza-1" })
+      .set("Authorization", `Bearer ${token}`);
+    const product = await request.get("/api/products/pizza-1");
 
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("Huueeek");
@@ -110,10 +116,10 @@ describe("PUT /api/products/reviews", function () {
   });
 
   it("should can update review with empty string description", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web).put("/api/products/reviews").send({ rating: 2, description: "", productSlug: "pizza-1" }).set("Authorization", token);
-    const product = await supertest(web).get("/api/products/pizza-1");
+    const result = await request.put("/api/products/reviews").send({ rating: 2, description: "", productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
+    const product = await request.get("/api/products/pizza-1");
 
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("");
@@ -125,10 +131,10 @@ describe("PUT /api/products/reviews", function () {
   });
 
   it("should can update review without description", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web).put("/api/products/reviews").send({ rating: 2, productSlug: "pizza-1" }).set("Authorization", token);
-    const product = await supertest(web).get("/api/products/pizza-1");
+    const result = await request.put("/api/products/reviews").send({ rating: 2, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
+    const product = await request.get("/api/products/pizza-1");
 
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("Wailah enak");
@@ -140,9 +146,9 @@ describe("PUT /api/products/reviews", function () {
   });
 
   it("should reject update if request is invalid", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web).put("/api/products/reviews").send({}).set("Authorization", token);
+    const result = await request.put("/api/products/reviews").send({}).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -150,9 +156,9 @@ describe("PUT /api/products/reviews", function () {
   });
 
   it("should reject update if product slug is invalid", async () => {
-    await supertest(web).post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", token);
+    await request.post("/api/products/reviews").send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" }).set("Authorization", `Bearer ${token}`);
 
-    const result = await supertest(web).put("/api/products/reviews").send({ rating: 5, productSlug: "pizza-404" }).set("Authorization", token);
+    const result = await request.put("/api/products/reviews").send({ rating: 5, productSlug: "pizza-404" }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();

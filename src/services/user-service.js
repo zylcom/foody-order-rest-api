@@ -1,9 +1,13 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import validate from "../validation/validation.js";
 import { v4 as uuid } from "uuid";
-import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation, usernameValidation } from "../validation/user-validation.js";
+import { loginUserValidation, registerUserValidation, updateUserValidation, usernameValidation } from "../validation/user-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
+import { verifyToken } from "../utils/index.js";
+
+const secretKey = process.env.JWT_SECRET_KEY;
 
 const register = async (request) => {
   const user = validate(registerUserValidation, request);
@@ -16,14 +20,11 @@ const register = async (request) => {
 
   user.password = await bcrypt.hash(user.password, 10);
 
-  const token = uuid().toString();
-
-  return prismaClient.user.create({
+  const registeredUser = await prismaClient.user.create({
     data: {
       username: user.username,
       password: user.password,
       phonenumber: user.phonenumberForm.number,
-      token,
       profile: { create: { name: user.name } },
       cart: { create: {} },
     },
@@ -31,55 +32,61 @@ const register = async (request) => {
       id: true,
       username: true,
       phonenumber: true,
-      token: true,
       profile: { select: { name: true, address: true, avatar: true } },
       cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
     },
   });
+
+  const token = jwt.sign({ username: registeredUser.username }, secretKey, { expiresIn: "30m" });
+
+  return { ...registeredUser, token };
 };
 
 const login = async (request) => {
-  const loginRequest = validate(loginUserValidation, request);
+  request = validate(loginUserValidation, request);
 
   const user = await prismaClient.user.findUnique({
-    where: { username: loginRequest.username },
-    select: { username: true, password: true, profile: { select: { address: true, avatar: true, name: true } } },
+    where: { username: request.username },
   });
 
   if (!user) {
     throw new ResponseError(401, "Username or password invalid!");
   }
 
-  const isPasswordValid = await bcrypt.compare(loginRequest.password, user.password);
+  const isPasswordValid = await bcrypt.compare(request.password, user.password);
 
   if (!isPasswordValid) {
     throw new ResponseError(401, "Username or password invalid!");
   }
 
-  const token = uuid().toString();
+  const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: "30m" });
 
-  return await prismaClient.user.update({ where: { username: user.username }, data: { token }, select: { token: true } });
+  return { token };
 };
 
 const get = async (token) => {
   if (token) {
-    token = validate(getUserValidation, token);
+    const decoded = verifyToken(token);
 
-    const user = await prismaClient.user.findFirst({
-      where: { token },
-      select: {
-        username: true,
-        phonenumber: true,
-        profile: { select: { address: true, avatar: true, name: true } },
-        cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
-      },
-    });
+    if (decoded.error) {
+      throw new ResponseError(422, decoded.error);
+    } else {
+      const user = await prismaClient.user
+        .findUnique({
+          where: { username: decoded.username },
+          select: {
+            username: true,
+            phonenumber: true,
+            profile: { select: { address: true, avatar: true, name: true } },
+            cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
+          },
+        })
+        .catch(() => {
+          throw new ResponseError(401, "Unauthorized!");
+        });
 
-    if (!user) {
-      throw new ResponseError(401, "Unauthorized!");
+      return user;
     }
-
-    return user;
   } else {
     return { guestUserId: uuid().toString() };
   }

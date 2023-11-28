@@ -6,8 +6,8 @@ const username = "test-user";
 const name = "Test User";
 const password = "rahasia123";
 const phonenumberForm = { number: "+6283806163238", countryId: "ID" };
-const token = "1fef98b8-55e9-424d-a0be-799a01e9881d";
-const invalidToken = "1fef98b8-442d-4edb-be95-799a01e9881d";
+const invalidToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inp5bGNvbS5kZXYiLCJpYXQiOjE3MDEwNjQyMDYsImV4cCI6MTcwMTA2NjAwNn0.QMRsgyCX8MRqj0wv4CpQn0nD3jv6mSw-eUyyDblQjZo";
 const productName = "Pizza";
 const productPrice = 10_000;
 const productSlug = "pizza";
@@ -41,7 +41,6 @@ const createTestUser = async () => {
       username,
       password: hashPassword,
       phonenumber: phonenumberForm.number,
-      token,
       profile: { create: { name } },
     },
   });
@@ -196,6 +195,5 @@ export {
   removeTestUser,
   removeTestReview,
   sessionId,
-  token,
   username,
 };

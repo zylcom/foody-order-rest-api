@@ -1,10 +1,14 @@
-import { createTestUser, invalidToken, removeManyCartItems, removeTestUser, token, username } from "./test-util";
+import { createTestUser, invalidToken, password, removeManyCartItems, removeTestUser, username } from "./test-util";
 import { calculateTotalPrice } from "../src/utils";
 import { request } from "./setup";
 
 describe("POST /api/orders", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -12,10 +16,10 @@ describe("POST /api/orders", function () {
   });
 
   it("should can create new order as authenticated user", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const result = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
 
     expect(result.status).toBe(200);
@@ -46,7 +50,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const result = await request
       .post("/api/orders")
       .set("Authorization", "invalid-token")
@@ -60,7 +64,7 @@ describe("POST /api/orders", function () {
   it("should reject if item is empty", async () => {
     await removeManyCartItems();
 
-    const result = await request.post("/api/orders").set("Authorization", token);
+    const result = await request.post("/api/orders").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -69,8 +73,12 @@ describe("POST /api/orders", function () {
 });
 
 describe("POST /api/orders/checkout", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -78,13 +86,13 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should can checkout order as authenticated user", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
 
-    const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
+    const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -110,10 +118,10 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", "invalid-token");
 
@@ -123,13 +131,13 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should return old session if not expired", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
-    const oldSession = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
-    const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", token);
+    const oldSession = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
+    const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data.sessionId).toBe(oldSession.body.data.sessionId);
@@ -139,8 +147,12 @@ describe("POST /api/orders/checkout", function () {
 });
 
 describe("GET /api/orders/:orderId", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -148,13 +160,13 @@ describe("GET /api/orders/:orderId", function () {
   });
 
   it("should can get order as authenticated user", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
 
-    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", token);
+    const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBe(order.body.data.id);
@@ -183,7 +195,7 @@ describe("GET /api/orders/:orderId", function () {
 
   it("should reject if order id is invalid", async () => {
     await request.post("/api/orders").send({ cartItems: [{ productSlug: "pizza-1", quantity: 5 }] });
-    const result = await request.get("/api/orders/404").set("Authorization", token);
+    const result = await request.get("/api/orders/404").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
@@ -192,8 +204,12 @@ describe("GET /api/orders/:orderId", function () {
 });
 
 describe("POST /api/orders/:orderId/cancel", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -201,13 +217,13 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should can cancel order as authenticated user", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
 
-    const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", token);
+    const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data.id).toBe(order.body.data.id);
@@ -235,10 +251,10 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
     const order = await request
       .post("/api/orders")
-      .set("Authorization", token)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...cart.body.data });
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", invalidToken);
@@ -254,14 +270,14 @@ describe("POST /api/orders/:orderId/cancel", function () {
       .send({ username: "test-order", name: "Test Order", password: "rahasia123", phonenumberForm: { number: "+6288293106563", countryId: "ID" } });
     const authUser = await request.post("/api/users/login").send({ username: user.body.data.username, password: "rahasia123" });
     const product = await request.get("/api/products/pizza-0");
-    await request.put("/api/carts/items").set("Authorization", authUser.body.data.token).send({ productSlug: product.body.data.slug, quantity: 5 });
-    const cart = await request.get("/api/carts").set("Authorization", token);
+    await request.put("/api/carts/items").set("Authorization", `Bearer ${authUser.body.data.token}`).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const cart = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
 
     const order = await request
       .post("/api/orders")
-      .set("Authorization", authUser.body.data.token)
+      .set("Authorization", `Bearer ${authUser.body.data.token}`)
       .send({ ...cart.body.data });
-    const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", token);
+    const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.data).toBeUndefined();

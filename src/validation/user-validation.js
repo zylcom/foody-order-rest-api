@@ -53,11 +53,6 @@ const loginUserValidation = z
   })
   .strict();
 
-const getUserValidation = z
-  .string({ invalid_type_error: "Token must be a string!", required_error: "Token is required!" })
-  .min(1, { message: "Token is not allowed to be empty!" })
-  .uuid({ message: "Token is invalid!" });
-
 const updateUserValidation = userData.required({ id: true });
 
-export { registerUserValidation, loginUserValidation, getUserValidation, updateUserValidation, usernameValidation };
+export { registerUserValidation, loginUserValidation, updateUserValidation, usernameValidation };

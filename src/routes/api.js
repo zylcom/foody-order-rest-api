@@ -4,7 +4,7 @@ import userController from "../controllers/user-controller.js";
 import cartItemController from "../controllers/cart-item-controller.js";
 import reviewController from "../controllers/review-controller.js";
 import likeProductController from "../controllers/like-product-controller.js";
-import productController from "../controllers/product-controller.js";
+// import productController from "../controllers/product-controller.js";
 import { authMiddleware } from "../middleware/auth-middleware.js";
 
 const userRouter = new express.Router();
@@ -26,8 +26,8 @@ userRouter.put("/api/products/reviews", reviewController.update);
 userRouter.post("/api/products/:productSlug/like", likeProductController.like);
 userRouter.delete("/api/products/:productSlug/like", likeProductController.neutral);
 
-userRouter.post("/api/products/create", productController.create);
-userRouter.put("/api/products", productController.update);
-userRouter.delete("/api/products/:productSlug", productController.deleteProduct);
+// userRouter.post("/api/products/create", productController.create);
+// userRouter.put("/api/products", productController.update);
+// userRouter.delete("/api/products/:productSlug", productController.deleteProduct);
 
 export { userRouter };
