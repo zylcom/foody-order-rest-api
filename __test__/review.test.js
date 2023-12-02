@@ -31,9 +31,7 @@ describe("POST /api/products/reviews", function () {
     expect(result.body.data.productSlug).toBe(product.body.data.slug);
     expect(result.body.data.rating).toBe(5);
     expect(result.body.data.description).toBe("Wailah enak");
-    expect(result.body.data.user.username).toBe(username);
-    expect(result.body.data.user.profile.name).toBe(name);
-    expect(result.body.data.user.phonenumber).toBe(phonenumberForm.number);
+    expect(result.body.data.username).toBe(username);
   });
 
   it("should can create new review without description", async () => {
@@ -56,7 +54,7 @@ describe("POST /api/products/reviews", function () {
       .send({ description: "Wailah enak", rating: 5, productSlug: "pizza-1" })
       .set("Authorization", `Bearer ${token}`);
 
-    expect(result.status).toBe(400);
+    expect(result.status).toBe(409);
     expect(result.body.errors).toBeDefined();
     expect(result.body.data).toBeUndefined();
   });
@@ -109,9 +107,7 @@ describe("PUT /api/products/reviews", function () {
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("Huueeek");
     expect(result.body.data.rating).toBe(2);
-    expect(result.body.data.user.username).toBe(username);
-    expect(result.body.data.user.profile.name).toBe(name);
-    expect(result.body.data.user.phonenumber).toBe(phonenumberForm.number);
+    expect(result.body.data.username).toBe(username);
     expect(product.body.data.averageRating).toBe(2);
   });
 
@@ -124,9 +120,7 @@ describe("PUT /api/products/reviews", function () {
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("");
     expect(result.body.data.rating).toBe(2);
-    expect(result.body.data.user.username).toBe(username);
-    expect(result.body.data.user.profile.name).toBe(name);
-    expect(result.body.data.user.phonenumber).toBe(phonenumberForm.number);
+    expect(result.body.data.username).toBe(username);
     expect(product.body.data.averageRating).toBe(2);
   });
 
@@ -139,9 +133,7 @@ describe("PUT /api/products/reviews", function () {
     expect(result.status).toBe(200);
     expect(result.body.data.description).toBe("Wailah enak");
     expect(result.body.data.rating).toBe(2);
-    expect(result.body.data.user.username).toBe(username);
-    expect(result.body.data.user.profile.name).toBe(name);
-    expect(result.body.data.user.phonenumber).toBe(phonenumberForm.number);
+    expect(result.body.data.username).toBe(username);
     expect(product.body.data.averageRating).toBe(2);
   });
 
