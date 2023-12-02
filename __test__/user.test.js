@@ -113,8 +113,6 @@ describe("GET /api/users/current", function () {
   it("should reject if token is invalid", async () => {
     const result = await request.get("/api/users/current").set("Authorization", `Bearer ${invalidToken}`);
 
-    console.log(result.body);
-
     expect(result.status).toBe(422);
     expect(result.body.errors).toBeDefined();
   });
@@ -129,7 +127,6 @@ describe("GET /api/users/current", function () {
 
 describe("PATCH /api/users/current", function () {
   const newName = "New Test User Name";
-  const newPassword = "new-password";
   let token;
 
   beforeEach(async () => {
@@ -143,9 +140,9 @@ describe("PATCH /api/users/current", function () {
   });
 
   it("should can update current user", async () => {
-    const result = await request.patch("/api/users/current").set("Authorization", `Bearer ${token}`).send({ name: newName, password: newPassword });
+    const result = await request.patch("/api/users/current").set("Authorization", `Bearer ${token}`).send({ name: newName });
     const testUser = await getTestUser();
-    const isValidPassword = await bcrypt.compare(newPassword, testUser.password);
+    const isValidPassword = await bcrypt.compare(password, testUser.password);
 
     expect(result.status).toBe(200);
     expect(result.body.data.username).toBe(username);
@@ -164,19 +161,8 @@ describe("PATCH /api/users/current", function () {
     expect(isValidPassword).toBe(true);
   });
 
-  it("should can update password current user", async () => {
-    const result = await request.patch("/api/users/current").set("Authorization", `Bearer ${token}`).send({ password: newPassword });
-    const testUser = await getTestUser();
-    const isValidPassword = await bcrypt.compare(newPassword, testUser.password);
-
-    expect(result.status).toBe(200);
-    expect(result.body.data.username).toBe(username);
-    expect(result.body.data.profile.name).toBe(name);
-    expect(isValidPassword).toBe(true);
-  });
-
   it("should reject if token is invalid", async () => {
-    const result = await request.patch("/api/users/current").set("Authorization", `Bearer ${invalidToken}`).send({ password: newPassword });
+    const result = await request.patch("/api/users/current").set("Authorization", `Bearer ${invalidToken}`).send({ name: newName });
 
     expect(result.status).toBe(422);
     expect(result.body.data).toBeUndefined();

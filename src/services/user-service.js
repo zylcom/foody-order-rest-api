@@ -101,28 +101,13 @@ const update = async (request) => {
     throw new ResponseError(404, "User not found!");
   }
 
-  const data = {};
-
-  if (user.username) {
-    data.username = user.username;
-  }
-
-  if (user.password) {
-    data.password = await bcrypt.hash(user.password, 10);
-  }
-
-  if (user.name) {
-    data.name = user.name;
-  }
-
   return prismaClient.user.update({
     where: { id: user.id },
     data: {
-      username: data.username,
-      password: data.password,
-      profile: { update: { name: data.name } },
+      phonenumber: user.phonenumberForm?.number,
+      profile: { update: { name: user?.name, address: user?.address } },
     },
-    select: { username: true, profile: { select: { address: true, avatar: true, name: true } } },
+    select: { id: true, username: true, phonenumber: true, profile: { select: { address: true, avatar: true, name: true } } },
   });
 };
 
