@@ -74,7 +74,7 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can get all products", async () => {
-    const result = await request.get("/api/products/search").query({ getAll: true });
+    const result = await request.get("/api/products/search").query({ all: true });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
@@ -85,7 +85,7 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can get all products even with size query", async () => {
-    const result = await request.get("/api/products/search").query({ getAll: true });
+    const result = await request.get("/api/products/search").query({ size: 5, all: true });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(20);
