@@ -11,14 +11,14 @@ export const authMiddleware = async (req, res, next) => {
 
     if (decoded.error) {
       res.status(422).json({ errors: decoded.error }).end();
+    } else {
+      const user = await prismaClient.user.findUnique({ where: { username: decoded.username }, include: { cart: true, profile: true } }).catch(() => {
+        res.status(401).json({ errors: "Unauthorized" }).end();
+      });
+
+      req.user = user;
+
+      next();
     }
-
-    const user = await prismaClient.user.findUnique({ where: { username: decoded.username }, include: { cart: true, profile: true } }).catch(() => {
-      res.status(401).json({ errors: "Unauthorized" }).end();
-    });
-
-    req.user = user;
-
-    next();
   }
 };
