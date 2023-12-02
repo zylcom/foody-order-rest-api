@@ -4,7 +4,6 @@ CREATE TABLE `users` (
     `username` VARCHAR(100) NOT NULL,
     `phonenumber` VARCHAR(100) NOT NULL,
     `password` VARCHAR(100) NOT NULL,
-    `token` VARCHAR(100) NULL,
 
     UNIQUE INDEX `users_username_key`(`username`),
     PRIMARY KEY (`id`)
@@ -27,7 +26,7 @@ CREATE TABLE `products` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `slug` VARCHAR(100) NOT NULL,
-    `image` VARCHAR(255) NOT NULL DEFAULT 'https://res.cloudinary.com/dk9bcf16t/image/upload/v1699423349/default_rhnd0q.jpg',
+    `image` VARCHAR(255) NOT NULL DEFAULT 'https://res.cloudinary.com/dk9bcf16t/image/upload/v1699505599/default_v5bzrz.jpg',
     `price` INTEGER NOT NULL,
     `averageRating` FLOAT NULL,
     `description` TEXT NULL,
