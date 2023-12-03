@@ -115,7 +115,7 @@ paths:
     get:
       tags:
         - users
-      summary: Get data of authenticated user or create new guest user id.
+      summary: Get data of authenticated user
       responses:
         "200":
           description: Data of authenticated user
@@ -127,19 +127,8 @@ paths:
                   - properties:
                       cart:
                         $ref: "#/components/schemas/Cart"
-        "201":
-          description: Created guest user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      guestUserId:
-                        type: string
-                        example: 6429c8d9-2dee-4677-9364-9aca60a303d0
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "422":
           $ref: "#/components/responses/TokenError"
         "500":
@@ -197,6 +186,28 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "422":
           $ref: "#/components/responses/TokenError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /api/users/guest:
+    get:
+      tags:
+        - "users"
+      summary: Create guest user id
+      security: []
+      responses:
+        "201":
+          description: Created guest user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      guestUserId:
+                        type: string
+                        example: 6429c8d9-2dee-4677-9364-9aca60a303d0
         "500":
           $ref: "#/components/responses/InternalServerError"
   /api/users/login:
