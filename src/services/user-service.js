@@ -64,32 +64,33 @@ const login = async (request) => {
   return { token };
 };
 
-const get = async (token) => {
-  if (token) {
-    const decoded = verifyToken(token);
+const get = async (username) => {
+  username = validate(usernameValidation, username);
 
-    if (decoded.error) {
-      throw new ResponseError(422, decoded.error);
-    } else {
-      const user = await prismaClient.user
-        .findUnique({
-          where: { username: decoded.username },
+  const user = await prismaClient.user
+    .findUnique({
+      where: { username },
+      select: {
+        username: true,
+        phonenumber: true,
+        profile: { select: { address: true, avatar: true, name: true } },
+        cart: {
           select: {
+            id: true,
+            totalPrice: true,
             username: true,
-            phonenumber: true,
-            profile: { select: { address: true, avatar: true, name: true } },
-            cart: { select: { id: true, totalPrice: true, username: true, createdAt: true, updatedAt: true, cartItems: true } },
+            createdAt: true,
+            updatedAt: true,
+            cartItems: { select: { id: true, cartId: true, productSlug: true, quantity: true, createdAt: true, updatedAt: true, product: true } },
           },
-        })
-        .catch(() => {
-          throw new ResponseError(401, "Unauthorized!");
-        });
+        },
+      },
+    })
+    .catch(() => {
+      throw new ResponseError(401, "Unauthorized!");
+    });
 
-      return user;
-    }
-  } else {
-    return { guestUserId: uuid().toString() };
-  }
+  return user;
 };
 
 const update = async (request) => {
@@ -123,10 +124,6 @@ const logout = async (username) => {
   return prismaClient.user.update({ where: { username }, data: { token: null }, select: { username: true } });
 };
 
-export default {
-  get,
-  login,
-  logout,
-  register,
-  update,
-};
+const createGuestUser = () => ({ guestUserId: uuid().toString() });
+
+export default { createGuestUser, get, login, logout, register, update };

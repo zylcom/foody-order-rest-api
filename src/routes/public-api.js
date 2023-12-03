@@ -13,6 +13,7 @@ const publicRouter = new express.Router();
 
 publicRouter.post("/api/users/login", userController.login);
 publicRouter.post("/api/users", userController.register);
+publicRouter.get("/api/users/guest", userController.createGuestUser);
 
 publicRouter.get("/api/products", productController.infinite);
 publicRouter.get("/api/products/search", productController.search);
@@ -25,8 +26,6 @@ publicRouter.get("/api/tags/:productCategory", tagController.getByCategory);
 publicRouter.get("/api/categories", categoryController.get);
 
 publicRouter.post("/api/carts/validate", cartController.validateCart);
-
-publicRouter.get("/api/users/current", userController.get);
 
 publicRouter.use(guestMiddleware);
 
