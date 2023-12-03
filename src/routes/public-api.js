@@ -13,7 +13,7 @@ const publicRouter = new express.Router();
 
 publicRouter.post("/api/users/login", userController.login); // documented
 publicRouter.post("/api/users", userController.register); // documented
-publicRouter.get("/api/users/current", userController.get); // documented
+publicRouter.get("/api/users/guest", userController.createGuestUser);
 
 publicRouter.get("/api/products", productController.infinite); // documented
 publicRouter.get("/api/products/search", productController.search); // documented

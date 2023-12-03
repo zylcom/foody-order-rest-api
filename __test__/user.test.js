@@ -100,7 +100,7 @@ describe("GET /api/users/current", function () {
     await removeTestUser();
   });
 
-  it("should can get current user", async () => {
+  it("should can get current authenticated user", async () => {
     const result = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
@@ -116,9 +116,11 @@ describe("GET /api/users/current", function () {
     expect(result.status).toBe(422);
     expect(result.body.errors).toBeDefined();
   });
+});
 
+describe("GET /api/users/guest", function () {
   it("should return guest user id if token not provided", async () => {
-    const result = await request.get("/api/users/current");
+    const result = await request.get("/api/users/guest");
 
     expect(result.status).toBe(201);
     expect(validate(result.body.data.guestUserId)).toBe(true);
