@@ -31,7 +31,7 @@ describe("POST /api/orders", function () {
   });
 
   it("should can create new order as guest user", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
     const cart = {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
@@ -100,7 +100,7 @@ describe("POST /api/orders/checkout", function () {
   });
 
   it("should can checkout order as guest user", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
     const cart = {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
@@ -175,7 +175,7 @@ describe("GET /api/orders/:orderId", function () {
   });
 
   it("should can get order as guest user", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
     const cart = {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
@@ -232,7 +232,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should can cancel order as guest user", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
     const cart = {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
@@ -285,7 +285,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
   });
 
   it("should reject if cancel other guest user order", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
     const cart = {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
@@ -294,7 +294,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
       .post("/api/orders")
       .query({ guest_uid: guestUser.body.data.guestUserId })
       .send({ ...cart });
-    const otherGuestUser = await request.get("/api/users/current");
+    const otherGuestUser = await request.get("/api/users/guest");
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).query({ guest_uid: otherGuestUser.body.data.guestUserId });
 

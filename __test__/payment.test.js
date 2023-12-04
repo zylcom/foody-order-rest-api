@@ -11,7 +11,7 @@ describe("GET /api/payment/:sessionId", function () {
   });
 
   it("should can get payment data", async () => {
-    const guestUser = await request.get("/api/users/current");
+    const guestUser = await request.get("/api/users/guest");
 
     await createPaymentTest(guestUser.body.data.guestUserId);
     const result = await request.get(`/api/payment/${sessionId}`).query({ guest_uid: guestUser.body.data.guestUserId });
@@ -22,5 +22,3 @@ describe("GET /api/payment/:sessionId", function () {
     expect(result.body.data.payment.name).toBe(name);
   });
 });
-
-// reni m
