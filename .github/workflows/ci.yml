@@ -54,6 +54,7 @@ jobs:
           STRIPE_ENDPOINT_SECRET: ${{ secrets.STRIPE_ENDPOINT_SECRET }}
           FRONT_END_BASE_URL: ${{ vars.FRONT_END_BASE_URL }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          MIDTRANS_SERVER_KEY: ${{ secrets.MIDTRANS_SERVER_KEY }}
         run: |
           npx prisma migrate deploy
           npm test
