@@ -3,14 +3,14 @@ import orderService from "../services/order-service.js";
 const create = async (req, res, next) => {
   try {
     const request = {
-      cart: req.body,
       username: req?.user?.username,
       guestUserId: req.guestUserId,
+      ...req.body,
     };
 
     const result = await orderService.create(request);
 
-    res.status(200).json({ data: result });
+    res.status(201).json({ data: result });
   } catch (error) {
     next(error);
   }

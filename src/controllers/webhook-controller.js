@@ -4,7 +4,7 @@ const webhook = async (req, res, next) => {
   try {
     const request = {
       body: req.body,
-      sig: req.headers["stripe-signature"],
+      // sig: req.headers["stripe-signature"],
     };
 
     await webhookService.webhook(request);

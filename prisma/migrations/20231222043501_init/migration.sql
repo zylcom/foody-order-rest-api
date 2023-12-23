@@ -106,7 +106,7 @@ CREATE TABLE `cart_items` (
 -- CreateTable
 CREATE TABLE `order_items` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `orderId` INTEGER NOT NULL,
+    `orderId` VARCHAR(191) NOT NULL,
     `productSlug` VARCHAR(191) NULL,
     `productName` VARCHAR(100) NOT NULL,
     `price` INTEGER NOT NULL,
@@ -121,32 +121,19 @@ CREATE TABLE `order_items` (
 
 -- CreateTable
 CREATE TABLE `orders` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(191) NOT NULL,
     `username` VARCHAR(191) NULL,
+    `name` VARCHAR(191) NULL,
     `guestId` VARCHAR(191) NULL,
     `email` VARCHAR(191) NULL,
-    `checkoutSessionId` VARCHAR(191) NULL,
     `status` VARCHAR(50) NOT NULL DEFAULT 'uncomplete',
+    `transactionToken` VARCHAR(191) NULL,
     `total` INTEGER NOT NULL,
     `subTotal` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `orders_checkoutSessionId_key`(`checkoutSessionId`),
     INDEX `orders_username_idx`(`username`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `checkout_sessions` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `sessionId` VARCHAR(255) NOT NULL,
-    `url` LONGTEXT NOT NULL,
-    `expiresAt` DATETIME(3) NOT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
-
-    UNIQUE INDEX `checkout_sessions_sessionId_key`(`sessionId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -160,7 +147,7 @@ CREATE TABLE `payments` (
     `username` VARCHAR(191) NULL,
     `guestId` VARCHAR(191) NULL,
     `amount` INTEGER NOT NULL,
-    `orderId` INTEGER NOT NULL,
+    `orderId` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -171,14 +158,14 @@ CREATE TABLE `payments` (
 -- CreateTable
 CREATE TABLE `shipments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `orderId` INTEGER NOT NULL,
+    `orderId` VARCHAR(191) NOT NULL,
     `address` VARCHAR(100) NOT NULL,
-    `country` VARCHAR(100) NOT NULL,
     `city` VARCHAR(100) NOT NULL,
     `detail` TEXT NOT NULL,
     `state` VARCHAR(100) NOT NULL,
-    `zipCode` VARCHAR(25) NOT NULL,
+    `postalCode` VARCHAR(25) NOT NULL,
     `status` VARCHAR(50) NOT NULL DEFAULT 'onprogress',
+    `method` VARCHAR(50) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `phone` VARCHAR(25) NOT NULL,
     `cost` INTEGER NOT NULL DEFAULT 0,
