@@ -1,6 +1,28 @@
 import { createTestUser, invalidToken, password, removeManyCartItems, removeTestUser, username } from "./test-util";
 import { calculateTotalPrice } from "../src/utils";
 import { request } from "./setup";
+import { validate } from "uuid";
+
+const customerDetails = {
+  name: "Zylcom",
+  phonenumberForm: {
+    number: "000000000000",
+    countryCode: "ID",
+  },
+};
+
+const shippingDetails = {
+  address: "adres",
+  detail: "home detail",
+  city: "jkbar",
+  state: "Jkt",
+  postalCode: "11224",
+};
+
+const deliveryDetails = {
+  method: "express",
+  cost: 5000,
+};
 
 describe("POST /api/orders", function () {
   let token;
@@ -20,13 +42,20 @@ describe("POST /api/orders", function () {
     const result = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({
+        cart: { ...cart.body.data },
+        customerDetails,
+        shippingDetails,
+        deliveryDetails,
+      });
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(201);
     expect(result.body.data.username).toBe(username);
     expect(result.body.data.guestId).toBeNull();
     expect(result.body.data.status).toBe("uncomplete");
-    expect(result.body.data.total).toBe(calculateTotalPrice(cart.body.data.cartItems));
+    expect(result.body.data.total).toBe(
+      calculateTotalPrice([...cart.body.data.cartItems, { name: deliveryDetails.method, quantity: 1, product: { price: deliveryDetails.cost } }])
+    );
     expect(result.body.data.subTotal).toBe(calculateTotalPrice(cart.body.data.cartItems));
   });
 
@@ -36,16 +65,18 @@ describe("POST /api/orders", function () {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
     };
-    const result = await request
-      .post("/api/orders")
-      .query({ guest_uid: guestUser.body.data.guestUserId })
-      .send({ ...cart });
+    const result = await request.post("/api/orders").query({ guest_uid: guestUser.body.data.guestUserId }).send({
+      cart,
+      customerDetails,
+      shippingDetails,
+      deliveryDetails,
+    });
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(201);
     expect(result.body.data.username).toBeNull();
     expect(result.body.data.guestId).toBe(guestUser.body.data.guestUserId);
     expect(result.body.data.status).toBe("uncomplete");
-    expect(result.body.data.total).toBe(cart.totalPrice);
+    expect(result.body.data.total).toBe(cart.totalPrice + deliveryDetails.cost);
     expect(result.body.data.subTotal).toBe(cart.totalPrice);
   });
 
@@ -54,7 +85,7 @@ describe("POST /api/orders", function () {
     const result = await request
       .post("/api/orders")
       .set("Authorization", "invalid-token")
-      .send({ ...cart.body.data });
+      .send({ cart: { ...cart.body.data }, customerDetails, shippingDetails, deliveryDetails });
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
@@ -90,13 +121,18 @@ describe("POST /api/orders/checkout", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({
+        cart: { ...cart.body.data },
+        customerDetails,
+        shippingDetails,
+        deliveryDetails,
+      });
 
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
-    expect(result.body.data).toHaveProperty("url");
+    expect(validate(result.body.data)).toBe(true);
   });
 
   it("should can checkout order as guest user", async () => {
@@ -105,16 +141,18 @@ describe("POST /api/orders/checkout", function () {
       cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
       totalPrice: 10001,
     };
-    const order = await request
-      .post("/api/orders")
-      .query({ guest_uid: guestUser.body.data.guestUserId })
-      .send({ ...cart });
+    const order = await request.post("/api/orders").query({ guest_uid: guestUser.body.data.guestUserId }).send({
+      cart,
+      customerDetails,
+      shippingDetails,
+      deliveryDetails,
+    });
 
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id, guest_uid: guestUser.body.data.guestUserId });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
-    expect(result.body.data).toHaveProperty("url");
+    expect(validate(result.body.data)).toBe(true);
   });
 
   it("should reject if token is invalid", async () => {
@@ -122,7 +160,12 @@ describe("POST /api/orders/checkout", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({
+        cart: { ...cart.body.data },
+        customerDetails,
+        shippingDetails,
+        deliveryDetails,
+      });
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", "invalid-token");
 
     expect(result.status).toBe(401);
@@ -135,14 +178,18 @@ describe("POST /api/orders/checkout", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({
+        cart: { ...cart.body.data },
+        customerDetails,
+        shippingDetails,
+        deliveryDetails,
+      });
     const oldSession = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
     const result = await request.post("/api/orders/checkout").query({ id: order.body.data.id }).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
-    expect(result.body.data.sessionId).toBe(oldSession.body.data.sessionId);
-    expect(result.body.data.url).toBe(oldSession.body.data.url);
-    expect(result.body.data.createdAt).toBe(oldSession.body.data.createdAt);
+    expect(validate(result.body.data)).toBe(true);
+    expect(result.body.data).toBe(oldSession.body.data);
   });
 });
 
@@ -164,7 +211,7 @@ describe("GET /api/orders/:orderId", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({ cart: { ...cart.body.data }, customerDetails, shippingDetails, deliveryDetails });
 
     const result = await request.get(`/api/orders/${order.body.data.id}`).set("Authorization", `Bearer ${token}`);
 
@@ -183,7 +230,7 @@ describe("GET /api/orders/:orderId", function () {
     const order = await request
       .post("/api/orders")
       .query({ guest_uid: guestUser.body.data.guestUserId })
-      .send({ ...cart });
+      .send({ cart, customerDetails, shippingDetails, deliveryDetails });
 
     const result = await request.get(`/api/orders/${order.body.data.id}`).query({ guest_uid: guestUser.body.data.guestUserId });
 
@@ -194,8 +241,8 @@ describe("GET /api/orders/:orderId", function () {
   });
 
   it("should reject if order id is invalid", async () => {
-    await request.post("/api/orders").send({ cartItems: [{ productSlug: "pizza-1", quantity: 5 }] });
-    const result = await request.get("/api/orders/404").set("Authorization", `Bearer ${token}`);
+    await request.post("/api/orders").send({ cart: { cartItems: [{ productSlug: "pizza-1", quantity: 5 }] }, customerDetails, shippingDetails, deliveryDetails });
+    const result = await request.get("/api/orders/f5e531e2-4fd6-4812-b839-be652fd18bd3").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
@@ -221,7 +268,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({ cart: { ...cart.body.data }, customerDetails, shippingDetails, deliveryDetails });
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", `Bearer ${token}`);
 
@@ -240,7 +287,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     const order = await request
       .post("/api/orders")
       .query({ guest_uid: guestUser.body.data.guestUserId })
-      .send({ ...cart });
+      .send({ cart, customerDetails, shippingDetails, deliveryDetails });
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).query({ guest_uid: guestUser.body.data.guestUserId });
 
@@ -255,7 +302,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...cart.body.data });
+      .send({ cart: { ...cart.body.data }, customerDetails, shippingDetails, deliveryDetails });
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", invalidToken);
 
@@ -276,7 +323,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     const order = await request
       .post("/api/orders")
       .set("Authorization", `Bearer ${authUser.body.data.token}`)
-      .send({ ...cart.body.data });
+      .send({ cart: { ...cart.body.data }, customerDetails, shippingDetails, deliveryDetails });
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
@@ -293,7 +340,7 @@ describe("POST /api/orders/:orderId/cancel", function () {
     const order = await request
       .post("/api/orders")
       .query({ guest_uid: guestUser.body.data.guestUserId })
-      .send({ ...cart });
+      .send({ cart, customerDetails, shippingDetails, deliveryDetails });
     const otherGuestUser = await request.get("/api/users/guest");
 
     const result = await request.post(`/api/orders/${order.body.data.id}/cancel`).query({ guest_uid: otherGuestUser.body.data.guestUserId });

@@ -18,7 +18,6 @@ const tagsProduct = [
   { id: 2, name: "Tag 2", slug: "tag-2" },
   { id: 3, name: "Tag 3", slug: "tag-3" },
 ];
-const sessionId = "cs_123";
 
 const createManyCartItems = () => {
   let items = [];
@@ -62,9 +61,9 @@ const removeTestUser = async () => {
   await removeTestProduct();
   await removeManyCartItems();
 
-  await prismaClient.checkoutSession.deleteMany({});
   await prismaClient.payment.deleteMany({});
   await prismaClient.orderItem.deleteMany({});
+  await prismaClient.shipment.deleteMany({});
   await prismaClient.order.deleteMany({});
   await prismaClient.cart.deleteMany({});
   await prismaClient.profile.deleteMany({});
@@ -155,7 +154,6 @@ const createPaymentTest = async (guestId) => {
   await prismaClient.order.create({
     data: {
       subTotal: 1001,
-      checkoutSessionId: sessionId,
       total: 1001,
       items: { create: [{ price: 1001, productName: "Pizza-1", quantity: 1, product: { connect: { slug: "pizza-1" } } }] },
       status: "complete",
@@ -194,6 +192,5 @@ export {
   removeTestProduct,
   removeTestUser,
   removeTestReview,
-  sessionId,
   username,
 };
