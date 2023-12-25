@@ -63,7 +63,7 @@ const webhook = async (notificationJson) => {
               status: "success",
               payment: {
                 update: {
-                  amount: statusResponse.gross_amount,
+                  amount: +statusResponse.gross_amount,
                   method: notificationJson.payment_type,
                   status: "paid",
                   signatureKey: statusResponse.signature_key,
@@ -83,7 +83,7 @@ const webhook = async (notificationJson) => {
             status: "success",
             payment: {
               update: {
-                amount: statusResponse.gross_amount,
+                amount: +statusResponse.gross_amount,
                 method: notificationJson.payment_type,
                 status: "paid",
                 signatureKey: statusResponse.signature_key,
