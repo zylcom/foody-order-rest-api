@@ -32,7 +32,7 @@ const webhook = async (notificationJson) => {
       Fraud status: ${statusResponse.fraud_status}`
     );
 
-    if (transactionStatus == "capture") {
+    if (statusResponse.transaction_status == "capture") {
       // capture only applies to card transaction, which you need to check for the fraudStatus
       if (fraudStatus == "challenge") {
         // TODO set transaction status on your databaase to 'challenge'
@@ -71,7 +71,7 @@ const webhook = async (notificationJson) => {
           },
         });
       }
-    } else if (transactionStatus == "settlement") {
+    } else if (statusResponse.transaction_status == "settlement") {
       // TODO set transaction status on your databaase to 'success'
       await prismaClient.order.update({
         where: { id: statusResponse.order_id },
@@ -89,13 +89,13 @@ const webhook = async (notificationJson) => {
           },
         },
       });
-    } else if (transactionStatus == "deny") {
+    } else if (statusResponse.transaction_status == "deny") {
       // TODO you can ignore 'deny', because most of the time it allows payment retries
       // and later can become success
-    } else if (transactionStatus == "cancel" || transactionStatus == "expire") {
+    } else if (statusResponse.transaction_status == "cancel" || statusResponse.transaction_status == "expire") {
       // TODO set transaction status on your databaase to 'failure'
       await prismaClient.order.update({ where: { id: statusResponse.order_id }, data: { status: "failure" } });
-    } else if (transactionStatus == "pending") {
+    } else if (statusResponse.transaction_status == "pending") {
       // TODO set transaction status on your databaase to 'pending' / waiting payment
       await prismaClient.order.update({ where: { id: statusResponse.order_id }, data: { status: "pending" } });
     }
