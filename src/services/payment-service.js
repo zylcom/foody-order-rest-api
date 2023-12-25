@@ -6,9 +6,9 @@ import { getPaymentValidation } from "../validation/payment-validation.js";
 const get = async (request) => {
   request = validate(getPaymentValidation, request);
 
-  const payment = await prismaClient.order.findFirst({
-    where: { AND: [{ checkoutSessionId: request.sessionId }, { OR: [{ username: request.username }, { guestId: request.guestUserId }] }] },
-    include: { shipment: true, payment: true },
+  const payment = await prismaClient.payment.findFirst({
+    where: { AND: [{ transactionId: request.transactionId }, { OR: [{ username: request.username }, { guestId: request.guestUserId }] }] },
+    include: { order: { include: { shipment: true } } },
   });
 
   if (!payment) {
