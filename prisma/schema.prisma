@@ -160,20 +160,21 @@ model Order {
 }
 
 model Payment {
-  id           Int      @id() @default(autoincrement())
-  status       String   @default("unpaid") @db.VarChar(50)
-  method       String?  @db.VarChar(50)
-  name         String
-  signatureKey String?
-  store        String?
-  currency     String?
-  username     String?
-  guestId      String?
-  amount       Int
-  order        Order    @relation(fields: [orderId], references: [id])
-  orderId      String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int      @id() @default(autoincrement())
+  status        String   @default("unpaid") @db.VarChar(50)
+  method        String?  @db.VarChar(50)
+  name          String
+  signatureKey  String?
+  transactionId String?
+  store         String?
+  currency      String?
+  username      String?
+  guestId       String?
+  amount        Int
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("payments")
 }
