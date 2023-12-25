@@ -33,7 +33,7 @@ publicRouter.get("/api/orders/:orderId", orderController.get);
 publicRouter.post("/api/orders/checkout", orderController.checkout);
 publicRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
-publicRouter.get("/api/payment/:sessionId", paymentController.get);
+publicRouter.get("/api/payment/:transactionId", paymentController.get);
 
 publicRouter.post("/api/feedback", feedbackController.create);
 
