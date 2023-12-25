@@ -141,9 +141,11 @@ CREATE TABLE `orders` (
 CREATE TABLE `payments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `status` VARCHAR(50) NOT NULL DEFAULT 'unpaid',
-    `method` VARCHAR(50) NOT NULL,
+    `method` VARCHAR(50) NULL,
     `name` VARCHAR(191) NOT NULL,
-    `paymentIntent` VARCHAR(191) NOT NULL,
+    `signatureKey` VARCHAR(191) NULL,
+    `store` VARCHAR(191) NULL,
+    `currency` VARCHAR(191) NULL,
     `username` VARCHAR(191) NULL,
     `guestId` VARCHAR(191) NULL,
     `amount` INTEGER NOT NULL,

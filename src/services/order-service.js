@@ -21,18 +21,19 @@ const create = async (request) => {
     product: { connect: { slug: item.productSlug } },
   }));
 
-  const totalPrice = calculateTotalPrice(items);
+  const subTotal = calculateTotalPrice(items);
+  const total = subTotal + request.deliveryDetails.cost;
 
   return prismaClient.order.create({
     data: {
-      subTotal: totalPrice,
-      total: totalPrice + request.deliveryDetails.cost,
+      subTotal: subTotal,
+      total,
       name: request.customerDetails.name,
       items: {
         create: orderItems,
       },
       user: request.username ? { connect: { username: request.username } } : undefined,
-      guestId: request.guestUserId,
+      guestId: request?.guestUserId,
       shipment: {
         create: {
           ...request.shippingDetails,
@@ -43,10 +44,19 @@ const create = async (request) => {
           deliveryDetails: undefined,
         },
       },
+      payment: {
+        create: {
+          amount: total,
+          name: request.customerDetails.name,
+          username: request?.username,
+          guestId: request?.guestUserId,
+        },
+      },
     },
     include: {
       items: { include: { product: true } },
       shipment: true,
+      payment: true,
     },
   });
 };
@@ -68,7 +78,7 @@ const checkout = async (request) => {
     throw new ResponseError(404, "Order not found!");
   }
 
-  if (order?.payment?.status === "settlement" || order?.payment?.status === "capture") {
+  if (order?.payment?.status === "paid") {
     return "Your order already completed.";
   }
 
