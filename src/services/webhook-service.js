@@ -22,7 +22,7 @@ const webhook = async (notificationJson) => {
   }
    */
 
-  snap.transaction.notification(notificationJson).then(async (statusResponse) => {
+  await snap.transaction.notification(notificationJson).then(async (statusResponse) => {
     console.log(statusResponse);
 
     console.log(
