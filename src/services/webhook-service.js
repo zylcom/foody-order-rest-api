@@ -44,7 +44,7 @@ const webhook = async (notificationJson) => {
               status: "challenge",
               payment: {
                 update: {
-                  amount: statusResponse.gross_amount,
+                  amount: +statusResponse.gross_amount,
                   method: notificationJson.payment_type,
                   status: "challenge",
                   signatureKey: statusResponse.signature_key,
