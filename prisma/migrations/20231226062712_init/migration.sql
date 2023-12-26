@@ -126,6 +126,7 @@ CREATE TABLE `orders` (
     `name` VARCHAR(191) NULL,
     `guestId` VARCHAR(191) NULL,
     `email` VARCHAR(191) NULL,
+    `phone` VARCHAR(25) NOT NULL,
     `status` VARCHAR(50) NOT NULL DEFAULT 'uncomplete',
     `transactionToken` VARCHAR(191) NULL,
     `total` INTEGER NOT NULL,

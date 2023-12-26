@@ -26,14 +26,15 @@ const create = async (request) => {
 
   return prismaClient.order.create({
     data: {
-      subTotal: subTotal,
+      subTotal,
       total,
       name: request.customerDetails.name,
+      guestId: request?.guestUserId,
+      phone: request.customerDetails.phonenumberForm.number,
+      user: request.username ? { connect: { username: request.username } } : undefined,
       items: {
         create: orderItems,
       },
-      user: request.username ? { connect: { username: request.username } } : undefined,
-      guestId: request?.guestUserId,
       shipment: {
         create: {
           ...request.shippingDetails,

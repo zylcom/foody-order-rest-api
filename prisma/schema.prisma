@@ -145,6 +145,7 @@ model Order {
   name             String?
   guestId          String?
   email            String?
+  phone            String      @db.VarChar(25)
   status           String      @default("uncomplete") @db.VarChar(50)
   transactionToken String?
   total            Int
