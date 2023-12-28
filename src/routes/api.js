@@ -15,6 +15,7 @@ userRouter.patch("/api/users/current", userController.update); // documented
 // userRouter.delete("/api/users/logout", userController.logout);
 
 userRouter.get("/api/carts", cartController.get); // documented
+userRouter.post("/api/carts/clear", cartController.clearCart); // documented
 
 userRouter.get("/api/carts/items", cartItemController.get); // documented
 userRouter.get("/api/carts/items/:productSlug", cartItemController.find); // documented
