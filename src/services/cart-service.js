@@ -32,4 +32,10 @@ const validateCart = async (cart) => {
   return { ...cart, cartItems: validCartItems, totalPrice: calculateTotalPrice(validCartItems) };
 };
 
-export default { get, validateCart };
+const clearCart = async (username) => {
+  const cart = await prismaClient.cart.update({ where: { username }, data: { totalPrice: 0, cartItems: { deleteMany: {} } }, include: { cartItems: true } });
+
+  return { ...cart };
+};
+
+export default { clearCart, get, validateCart };

@@ -1,15 +1,14 @@
 import cartService from "./cart-service.js";
 import validate from "../validation/validation.js";
-import { cancelOrderValidation, checkoutValidation, getOrderValidation } from "../validation/order-validation.js";
+import { cancelOrderValidation, checkoutValidation, createOrderValidation, getOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
-import { stripe } from "../plugin/stripe.js";
 import { calculateTotalPrice } from "../utils/index.js";
-
-const frontEndBaseUrl = process.env.FRONT_END_BASE_URL;
+import { snap } from "../plugin/midtrans.js";
 
 const create = async (request) => {
   const items = await cartService.validateCart(request.cart).then((response) => response.cartItems);
+  request = validate(createOrderValidation, request);
 
   if (items.length < 1) {
     throw new ResponseError(400, "At least you must have one item in cart to create an order!");
@@ -22,20 +21,43 @@ const create = async (request) => {
     product: { connect: { slug: item.productSlug } },
   }));
 
-  const totalPrice = calculateTotalPrice(items);
+  const subTotal = calculateTotalPrice(items);
+  const total = subTotal + request.deliveryDetails.cost;
 
   return prismaClient.order.create({
     data: {
-      subTotal: totalPrice,
-      total: totalPrice,
+      subTotal,
+      total,
+      name: request.customerDetails.name,
+      guestId: request?.guestUserId,
+      phone: request.customerDetails.phonenumberForm.number,
+      user: request.username ? { connect: { username: request.username } } : undefined,
       items: {
         create: orderItems,
       },
-      user: request.username ? { connect: { username: request.username } } : undefined,
-      guestId: request.guestUserId,
+      shipment: {
+        create: {
+          ...request.shippingDetails,
+          name: request.customerDetails.name,
+          phone: request.customerDetails.phonenumberForm.number,
+          cost: request.deliveryDetails.cost,
+          method: request.deliveryDetails.method,
+          deliveryDetails: undefined,
+        },
+      },
+      payment: {
+        create: {
+          amount: total,
+          name: request.customerDetails.name,
+          username: request?.username,
+          guestId: request?.guestUserId,
+        },
+      },
     },
     include: {
       items: { include: { product: true } },
+      shipment: true,
+      payment: true,
     },
   });
 };
@@ -45,89 +67,70 @@ const checkout = async (request) => {
 
   const order = await prismaClient.order.findUnique({
     where: { id: request.orderId },
-    include: { items: { include: { product: true } }, checkoutSession: true, user: { include: { profile: true } } },
+    include: {
+      items: { include: { product: true } },
+      user: { include: { profile: true } },
+      shipment: true,
+      payment: true,
+    },
   });
 
   if (!order) {
     throw new ResponseError(404, "Order not found!");
   }
 
-  let stripeOptions = {
-    payment_method_types: ["card"],
-    currency: "usd",
-    mode: "payment",
-    success_url: `${frontEndBaseUrl}/payment/{CHECKOUT_SESSION_ID}`,
-    cancel_url: `${frontEndBaseUrl}/order/${order.id}`,
-    client_reference_id: request.userId ? request.userId : request.guestUserId,
-    phone_number_collection: { enabled: true },
-    shipping_address_collection: {
-      allowed_countries: ["ID"],
-    },
-    shipping_options: [
-      {
-        shipping_rate_data: {
-          type: "fixed_amount",
-          fixed_amount: {
-            amount: 0,
-            currency: "usd",
-          },
-          display_name: "Free shipping (faster when on low demand)",
-          delivery_estimate: {
-            minimum: {
-              unit: "hour",
-              value: 2,
-            },
-          },
-        },
-      },
-      {
-        shipping_rate_data: {
-          type: "fixed_amount",
-          fixed_amount: {
-            amount: 1500,
-            currency: "usd",
-          },
-          display_name: "Hunngry Up (always fast even on high demand)",
-          delivery_estimate: {
-            minimum: {
-              unit: "hour",
-              value: 1,
-            },
-          },
-        },
-      },
-    ],
-    custom_text: {
-      shipping_address: {
-        message: "Fill address line 2 field with your house detail (number/color/position)",
-      },
-    },
-  };
-
-  if (!!order.checkoutSessionId && Date.now() < new Date(order.checkoutSession?.expiresAt).getTime()) {
-    return order.checkoutSession;
+  if (order?.payment?.status === "paid") {
+    return "Your order already completed.";
   }
 
-  stripeOptions.line_items = order.items.map((item) => {
-    return {
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.product.name,
-          description: item.product.description,
-          images: [`https://picsum.photos/1920/1280.webp?random=${item.product.id}`],
-        },
-        unit_amount: item.product.price,
+  const transactionData = await snap.transaction
+    .status(order.id)
+    .then((response) => response)
+    .catch(() => null);
+
+  const parameter = {
+    transaction_details: {
+      order_id: order.id,
+      gross_amount: order.total,
+    },
+    credit_card: { secure: true },
+    customer_details: {
+      first_name: order.name,
+      last_name: "",
+      username: order.username || undefined,
+      phone: order.shipment.phone,
+      shipping_address: {
+        first_name: order.name,
+        last_name: "",
+        username: order.username || undefined,
+        phone: order.shipment.phone,
+        address: order.shipment.address,
+        city: order.shipment.city,
+        postal_code: order.shipment.postalCode,
+        method: order.shipment.method,
+        cost: order.shipment.cost,
+        status: order.shipment.status,
+        detail: order.shipment.detail,
+        state: order.shipment.state,
       },
-      quantity: item.quantity,
-    };
-  });
+    },
+    item_details: [
+      ...order.items.map((item) => ({ id: item.product.id, price: item.price, quantity: item.quantity, name: item.productName })),
+      { id: "dc-".concat(order.id), price: order.shipment.cost, quantity: 1, name: "Delivery cost" },
+    ],
+  };
 
-  const session = await stripe.checkout.sessions.create(stripeOptions);
+  if (transactionData && transactionData.transaction_status !== "expire") {
+    return order.transactionToken;
+  } else if (order.transactionToken && !transactionData) {
+    return order.transactionToken;
+  } else {
+    const transactionToken = await snap.createTransactionToken(parameter);
 
-  return prismaClient.checkoutSession.create({
-    data: { sessionId: session.id, url: session.url, expiresAt: new Date(session.expires_at * 1000), order: { connect: { id: order.id } } },
-  });
+    await prismaClient.order.update({ where: { id: order.id }, data: { transactionToken } });
+
+    return transactionToken;
+  }
 };
 
 const get = async (request) => {

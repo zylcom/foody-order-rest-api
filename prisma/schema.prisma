@@ -17,7 +17,6 @@ model User {
   username    String          @unique @db.VarChar(100)
   phonenumber String          @db.VarChar(100)
   password    String          @db.VarChar(100)
-  token       String?         @db.VarChar(100)
   profile     Profile?
   cart        Cart?
   reviews     Review[]
@@ -125,7 +124,7 @@ model CartItem {
 model OrderItem {
   id          Int      @id() @default(autoincrement())
   order       Order    @relation(fields: [orderId], references: [id])
-  orderId     Int
+  orderId     String
   product     Product? @relation(fields: [productSlug], references: [slug])
   productSlug String?
   productName String   @db.VarChar(100)
@@ -140,49 +139,41 @@ model OrderItem {
 }
 
 model Order {
-  id                Int              @id() @default(autoincrement())
-  user              User?            @relation(fields: [username], references: [username])
-  username          String?
-  guestId           String?
-  email             String?
-  checkoutSession   CheckoutSession? @relation(fields: [checkoutSessionId], references: [sessionId])
-  checkoutSessionId String?          @unique
-  status            String           @default("uncomplete") @db.VarChar(50)
-  items             OrderItem[]
-  total             Int
-  subTotal          Int
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  shipment          Shipment?
-  payment           Payment?
+  id               String      @id() @default(uuid())
+  user             User?       @relation(fields: [username], references: [username])
+  username         String?
+  name             String?
+  guestId          String?
+  email            String?
+  phone            String      @db.VarChar(25)
+  status           String      @default("uncomplete") @db.VarChar(50)
+  transactionToken String?
+  total            Int
+  subTotal         Int
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  items            OrderItem[]
+  shipment         Shipment?
+  payment          Payment?
 
   @@index([username])
   @@map("orders")
 }
 
-model CheckoutSession {
-  id        Int      @id() @default(autoincrement())
-  sessionId String   @unique @db.VarChar(255)
-  order     Order?
-  url       String   @db.LongText
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("checkout_sessions")
-}
-
 model Payment {
   id            Int      @id() @default(autoincrement())
   status        String   @default("unpaid") @db.VarChar(50)
-  method        String   @db.VarChar(50)
+  method        String?  @db.VarChar(50)
   name          String
-  paymentIntent String
+  signatureKey  String?
+  transactionId String?
+  store         String?
+  currency      String?
   username      String?
   guestId       String?
   amount        Int
   order         Order    @relation(fields: [orderId], references: [id])
-  orderId       Int      @unique
+  orderId       String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -190,22 +181,22 @@ model Payment {
 }
 
 model Shipment {
-  id        Int       @id() @default(autoincrement())
-  order     Order     @relation(fields: [orderId], references: [id])
-  orderId   Int       @unique
-  address   String    @db.VarChar(100)
-  country   String    @db.VarChar(100)
-  city      String    @db.VarChar(100)
-  detail    String    @db.Text
-  state     String    @db.VarChar(100)
-  zipCode   String    @db.VarChar(25)
-  status    String    @default("onprogress") @db.VarChar(50)
-  name      String    @db.VarChar(100)
-  phone     String    @db.VarChar(25)
-  cost      Int       @default(0)
-  arrivedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         Int       @id() @default(autoincrement())
+  order      Order     @relation(fields: [orderId], references: [id])
+  orderId    String    @unique
+  address    String    @db.VarChar(100)
+  city       String    @db.VarChar(100)
+  detail     String    @db.Text
+  state      String    @db.VarChar(100)
+  postalCode String    @db.VarChar(25)
+  status     String    @default("onprogress") @db.VarChar(50)
+  method     String    @db.VarChar(50)
+  name       String    @db.VarChar(100)
+  phone      String    @db.VarChar(25)
+  cost       Int       @default(0)
+  arrivedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("shipments")
 }

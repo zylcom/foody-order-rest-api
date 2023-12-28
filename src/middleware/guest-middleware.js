@@ -1,16 +1,21 @@
 import { validate } from "uuid";
 import { prismaClient } from "../app/database.js";
+import { verifyToken } from "../utils/index.js";
 
 export const guestMiddleware = async (req, res, next) => {
-  const token = req.get("Authorization");
+  const token = req.headers.authorization?.split(" ")[1];
   const guestUserId = req.query.guest_uid;
 
   if (token) {
-    const user = await prismaClient.user.findFirst({ where: { token }, include: { cart: true, profile: true } });
+    const decoded = verifyToken(token);
 
-    if (!user) {
-      res.status(401).json({ errors: "Unauthorized" }).end();
+    if (decoded.error) {
+      res.status(422).json({ errors: decoded.error }).end();
     } else {
+      const user = await prismaClient.user.findUnique({ where: { username: decoded.username }, include: { cart: true, profile: true } }).catch(() => {
+        res.status(401).json({ errors: "Unauthorized" }).end();
+      });
+
       req.user = user;
 
       next();

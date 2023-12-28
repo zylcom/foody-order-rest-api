@@ -4,7 +4,7 @@ const get = async (req, res, next) => {
   try {
     const request = {
       username: req?.user?.username,
-      sessionId: req.params.sessionId,
+      transactionId: req.params.transactionId,
       guestUserId: req.guestUserId,
     };
 
@@ -12,8 +12,6 @@ const get = async (req, res, next) => {
 
     res.status(200).json({ data: result });
   } catch (error) {
-    // console.log(error);
-
     next(error);
   }
 };

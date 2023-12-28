@@ -1007,19 +1007,19 @@ async function main() {
 
       let totalPrice = 0;
 
-      for (let index = 0; index < Math.floor(Math.random() * 48 + 1); index++) {
+      for (let index = 0; index < Math.floor(Math.random() * 5 + 1); index++) {
         const products = await productsData();
         const randomUniqueID = generateUniqueRandomId(47);
         const result = await prismaClient.cartItem.upsert({
           update: {
             cart: { connect: { id: 1 } },
             product: { connect: { slug: products[randomUniqueID].slug } },
-            quantity: Math.floor(Math.random() * 999),
+            quantity: Math.floor(Math.random() * 100),
           },
           create: {
             cart: { connect: { id: 1 } },
             product: { connect: { slug: products[randomUniqueID].slug } },
-            quantity: Math.floor(Math.random() * 999),
+            quantity: Math.floor(Math.random() * 100),
           },
           where: {
             item: { productSlug: products[randomUniqueID].slug, cartId: 1 },

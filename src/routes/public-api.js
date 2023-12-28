@@ -11,22 +11,20 @@ import feedbackController from "../controllers/feedback-controller.js";
 
 const publicRouter = new express.Router();
 
-publicRouter.post("/api/users/login", userController.login);
-publicRouter.post("/api/users", userController.register);
+publicRouter.post("/api/users/login", userController.login); // documented
+publicRouter.post("/api/users", userController.register); // documented
+publicRouter.get("/api/users/guest", userController.createGuestUser);
 
-publicRouter.get("/api/products", productController.infinite);
-publicRouter.get("/api/products/search", productController.search);
-publicRouter.get("/api/products/best-rated", productController.getBestRated);
-publicRouter.get("/api/products/:slug", productController.get);
+publicRouter.get("/api/products", productController.infinite); // documented
+publicRouter.get("/api/products/search", productController.search); // documented
+publicRouter.get("/api/products/best-rated", productController.getBestRated); // documented
+publicRouter.get("/api/products/:slug", productController.get); // documented
 
-publicRouter.get("/api/tags", tagController.get);
-publicRouter.get("/api/tags/:productCategory", tagController.getByCategory);
+publicRouter.get("/api/tags", tagController.get); // documented
 
-publicRouter.get("/api/categories", categoryController.get);
+publicRouter.get("/api/categories", categoryController.get); // documented
 
 publicRouter.post("/api/carts/validate", cartController.validateCart);
-
-publicRouter.get("/api/users/current", userController.get);
 
 publicRouter.use(guestMiddleware);
 
@@ -35,7 +33,7 @@ publicRouter.get("/api/orders/:orderId", orderController.get);
 publicRouter.post("/api/orders/checkout", orderController.checkout);
 publicRouter.post("/api/orders/:orderId/cancel", orderController.cancel);
 
-publicRouter.get("/api/payment/:sessionId", paymentController.get);
+publicRouter.get("/api/payment/:transactionId", paymentController.get);
 
 publicRouter.post("/api/feedback", feedbackController.create);
 
