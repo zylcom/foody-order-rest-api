@@ -8,7 +8,7 @@ const get = async (request) => {
 
   const payment = await prismaClient.payment.findFirst({
     where: { AND: [{ transactionId: request.transactionId }, { OR: [{ username: request.username }, { guestId: request.guestUserId }] }] },
-    include: { order: { include: { shipment: true } } },
+    include: { order: { include: { shipment: true, items: { include: { product: true } } } } },
   });
 
   if (!payment) {
