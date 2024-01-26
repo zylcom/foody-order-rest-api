@@ -1,9 +1,12 @@
-import supertest from "supertest";
-import { web } from "../src/app/web";
-import { createTestUser, removeTestUser, token } from "./test-util";
+import { createTestUser, invalidToken, password, removeTestUser, username } from "./test-util";
+import { request } from "./setup";
+
+let token;
 
 beforeAll(async () => {
   await createTestUser();
+
+  token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
 });
 
 afterAll(async () => {
@@ -12,9 +15,9 @@ afterAll(async () => {
 
 describe("POST /api/products/:productSlug/like", function () {
   it("should can like product", async () => {
-    const user = await supertest(web).get("/api/users/current").set("Authorization", token);
-    const result = await supertest(web).post("/api/products/pizza-1/like").set("Authorization", token);
-    const product = await supertest(web).get("/api/products/pizza-1");
+    const user = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
+    const result = await request.post("/api/products/pizza-1/like").set("Authorization", `Bearer ${token}`);
+    const product = await request.get("/api/products/pizza-1");
 
     expect(result.status).toBe(200);
     expect(result.body.data.username).toBe(user.body.data.username);
@@ -23,15 +26,15 @@ describe("POST /api/products/:productSlug/like", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await supertest(web).post("/api/products/pizza-1/like").set("Authorization", "invalid-token");
+    const result = await request.post("/api/products/pizza-1/like").set("Authorization", `Bearer ${invalidToken}`);
 
-    expect(result.status).toBe(401);
+    expect(result.status).toBe(422);
     expect(result.body.errors).toBeDefined();
     expect(result.body.data).toBeUndefined();
   });
 
   it("should reject if product slug is invalid", async () => {
-    const result = await supertest(web).post("/api/products/pizza-404/like").set("Authorization", token);
+    const result = await request.post("/api/products/pizza-404/like").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.data).toBeUndefined();

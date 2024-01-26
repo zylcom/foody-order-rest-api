@@ -1,7 +1,10 @@
+import jwt from "jsonwebtoken";
 import { faker } from "@faker-js/faker";
 import { prismaClient } from "../app/database.js";
+import { ResponseError } from "../errors/response-error.js";
 
 const generatedId = [];
+const secretKey = process.env.JWT_SECRET_KEY;
 
 function generateUniqueRandomId(max) {
   let randomId;
@@ -55,4 +58,14 @@ function calculateTotalPrice(items) {
   }, 0);
 }
 
-export { calculateTotalPrice, generateUniqueRandomId, randomizeLikeProduct, randomizeReviewProduct };
+function verifyToken(token) {
+  return jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return { error: err.message };
+    } else {
+      return decoded;
+    }
+  });
+}
+
+export { calculateTotalPrice, generateUniqueRandomId, randomizeLikeProduct, randomizeReviewProduct, verifyToken };

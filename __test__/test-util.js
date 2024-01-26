@@ -4,10 +4,10 @@ import { calculateTotalPrice } from "../src/utils";
 
 const username = "test-user";
 const name = "Test User";
-const password = "rahasia";
+const password = "rahasia123";
 const phonenumberForm = { number: "+6283806163238", countryId: "ID" };
-const token = "1fef98b8-55e9-424d-a0be-799a01e9881d";
-const invalidToken = "1fef98b8-442d-4edb-be95-799a01e9881d";
+const invalidToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inp5bGNvbS5kZXYiLCJpYXQiOjE3MDEwNjQyMDYsImV4cCI6MTcwMTA2NjAwNn0.QMRsgyCX8MRqj0wv4CpQn0nD3jv6mSw-eUyyDblQjZo";
 const productName = "Pizza";
 const productPrice = 10_000;
 const productSlug = "pizza";
@@ -18,7 +18,6 @@ const tagsProduct = [
   { id: 2, name: "Tag 2", slug: "tag-2" },
   { id: 3, name: "Tag 3", slug: "tag-3" },
 ];
-const sessionId = "cs_123";
 
 const createManyCartItems = () => {
   let items = [];
@@ -41,7 +40,6 @@ const createTestUser = async () => {
       username,
       password: hashPassword,
       phonenumber: phonenumberForm.number,
-      token,
       profile: { create: { name } },
     },
   });
@@ -63,9 +61,9 @@ const removeTestUser = async () => {
   await removeTestProduct();
   await removeManyCartItems();
 
-  await prismaClient.checkoutSession.deleteMany({});
   await prismaClient.payment.deleteMany({});
   await prismaClient.orderItem.deleteMany({});
+  await prismaClient.shipment.deleteMany({});
   await prismaClient.order.deleteMany({});
   await prismaClient.cart.deleteMany({});
   await prismaClient.profile.deleteMany({});
@@ -156,7 +154,6 @@ const createPaymentTest = async (guestId) => {
   await prismaClient.order.create({
     data: {
       subTotal: 1001,
-      checkoutSessionId: sessionId,
       total: 1001,
       items: { create: [{ price: 1001, productName: "Pizza-1", quantity: 1, product: { connect: { slug: "pizza-1" } } }] },
       status: "complete",
@@ -195,7 +192,5 @@ export {
   removeTestProduct,
   removeTestUser,
   removeTestReview,
-  sessionId,
-  token,
   username,
 };

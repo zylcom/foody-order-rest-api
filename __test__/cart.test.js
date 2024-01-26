@@ -1,10 +1,14 @@
-import { createTestUser, removeTestUser, token } from "./test-util";
+import { createTestUser, invalidToken, password, removeTestUser, username } from "./test-util";
 import { calculateTotalPrice } from "../src/utils";
 import { request } from "./setup";
 
 describe("GET /api/carts", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -12,7 +16,7 @@ describe("GET /api/carts", function () {
   });
 
   it("should can get the cart current user", async () => {
-    const result = await request.get("/api/carts").set("Authorization", token);
+    const result = await request.get("/api/carts").set("Authorization", `Bearer ${token}`);
 
     expect(result.body.data.cartItems).toBeDefined();
     expect(result.body.data.cartItems.length).toBeGreaterThan(0);
@@ -20,7 +24,7 @@ describe("GET /api/carts", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const result = await request.get("/api/carts").set("Authorization", "invalid-token");
+    const result = await request.get("/api/carts").set("Authorization", `Bearer ${invalidToken}`);
 
     expect(result.body.errors).toBeDefined();
     expect(result.body.data).toBeUndefined();
@@ -57,5 +61,34 @@ describe("POST /api/carts/validate", function () {
     expect(result.body.data.cartItems).toHaveLength(2);
     expect(result.body.data.cartItems[0]).toHaveProperty("product");
     expect(result.body.data.cartItems[1]).toHaveProperty("product");
+  });
+});
+
+describe("POST /api/carts/clear", function () {
+  let token;
+
+  beforeEach(async () => {
+    await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can clear user cart", async () => {
+    const result = await request.post("/api/carts/clear").set("Authorization", `Bearer ${token}`);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.cartItems.length).toBe(0);
+    expect(result.body.data.totalPrice).toBe(0);
+  });
+
+  it("should reject if token is invalid", async () => {
+    const result = await request.post("/api/carts/clear").set("Authorization", `Bearer ${invalidToken}`);
+
+    expect(result.body.errors).toBeDefined();
+    expect(result.body.data).toBeUndefined();
   });
 });

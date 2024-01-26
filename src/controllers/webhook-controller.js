@@ -2,15 +2,12 @@ import webhookService from "../services/webhook-service.js";
 
 const webhook = async (req, res, next) => {
   try {
-    const request = {
-      body: req.body,
-      sig: req.headers["stripe-signature"],
-    };
-
-    await webhookService.webhook(request);
+    await webhookService.webhook({ ...req.body });
 
     res.status(200).json({ received: true });
   } catch (error) {
+    console.log(error);
+
     next(error);
   }
 };

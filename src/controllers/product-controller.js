@@ -14,13 +14,14 @@ const get = async (req, res, next) => {
 const search = async (req, res, next) => {
   try {
     const request = {
-      category: req.query.category,
-      name: req.query.name,
-      tag: req.query.tag,
-      size: req.query.size,
-      page: req.query.page,
-      getAll: req.query.getAll === "true" ? true : false,
+      category: req.query?.category,
+      name: req.query?.name,
+      tag: req.query?.tag,
+      size: req.query?.size,
+      page: req.query?.page,
+      getAll: req.query.all === "true" ? true : false,
     };
+
     const result = await productService.search(request);
 
     res.status(200).set("Cache-Control", "public, max-age=0, s-maxage=1, stale-while-revalidate=30").json({ data: result.data, paging: result.paging });

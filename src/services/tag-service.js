@@ -1,15 +1,11 @@
 import validate from "../validation/validation.js";
 import { prismaClient } from "../app/database.js";
-import { getTagByCategoryValidation } from "../validation/tag-validation.js";
+import { filterValidation } from "../validation/tag-validation.js";
 
-const get = () => {
-  return prismaClient.tag.findMany({});
+const get = (filter) => {
+  filter = validate(filterValidation, filter);
+
+  return prismaClient.tag.findMany({ where: { products: { some: { categorySlug: { contains: filter.categorySlug } } } } });
 };
 
-const getByCategory = (category) => {
-  category = validate(getTagByCategoryValidation, category);
-
-  return prismaClient.tag.findMany({ where: { products: { some: { categorySlug: category } } } });
-};
-
-export default { get, getByCategory };
+export default { get };

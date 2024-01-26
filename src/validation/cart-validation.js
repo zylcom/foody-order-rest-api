@@ -3,10 +3,17 @@ import { z } from "zod";
 const getCartValidation = z.string().max(100).nonempty({ message: "Username is not allowed to be empty!" });
 
 const cartValidation = z
-  .object({
-    cartItems: z.object({}).passthrough().array(),
-    totalPrice: z.number({ required_error: "Total price is required!", invalid_type_error: "Total price must be a number!" }),
-  })
+  .object(
+    {
+      cartItems: z
+        .object({}, { description: "Cart items", invalid_type_error: "Cart items must be an array of object", required_error: "Cart items is required!" })
+        .passthrough()
+        .array()
+        .default([]),
+      totalPrice: z.number({ required_error: "Total price is required!", invalid_type_error: "Total price must be a number!" }),
+    },
+    { invalid_type_error: "Cart must be an object.", required_error: "Cart is required!" }
+  )
   .partial()
   .transform((cart) => {
     const itemsProductSlug = [];

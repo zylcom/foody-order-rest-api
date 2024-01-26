@@ -1,10 +1,13 @@
-import supertest from "supertest";
-import { web } from "../src/app/web";
-import { createTestUser, removeTestUser, token } from "./test-util";
+import { createTestUser, password, removeTestUser, username, token } from "./test-util";
+import { request } from "./setup";
 
 describe("GET /api/carts/items/:productSlug", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -12,14 +15,14 @@ describe("GET /api/carts/items/:productSlug", function () {
   });
 
   it("should can get cart item", async () => {
-    const result = await supertest(web).get("/api/carts/items/pizza-1").set("Authorization", token);
+    const result = await request.get("/api/carts/items/pizza-1").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data.productSlug).toBe("pizza-1");
   });
 
   it("should reject if product slug is invalid", async () => {
-    const result = await supertest(web).get("/api/carts/items/pizza-404").set("Authorization", token);
+    const result = await request.get("/api/carts/items/pizza-404").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.errors).toBeDefined();
@@ -27,8 +30,12 @@ describe("GET /api/carts/items/:productSlug", function () {
 });
 
 describe("PUT /api/carts/items", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -36,8 +43,8 @@ describe("PUT /api/carts/items", function () {
   });
 
   it("should can insert cart item", async () => {
-    const product = await supertest(web).get("/api/products/pizza-0");
-    const result = await supertest(web).put("/api/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const product = await request.get("/api/products/pizza-0");
+    const result = await request.put("/api/carts/items").set("Authorization", `Bearer ${token}`).send({ productSlug: product.body.data.slug, quantity: 5 });
 
     expect(result.status).toBe(200);
     expect(result.body.data.quantity).toBe(5);
@@ -46,9 +53,9 @@ describe("PUT /api/carts/items", function () {
   });
 
   it("should can update cart item", async () => {
-    const product = await supertest(web).get("/api/products/pizza-0");
-    await supertest(web).put("/api/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 5 });
-    const result = await supertest(web).put("/api/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 10 });
+    const product = await request.get("/api/products/pizza-0");
+    await request.put("/api/carts/items").set("Authorization", `Bearer ${token}`).send({ productSlug: product.body.data.slug, quantity: 5 });
+    const result = await request.put("/api/carts/items").set("Authorization", `Bearer ${token}`).send({ productSlug: product.body.data.slug, quantity: 10 });
 
     expect(result.status).toBe(200);
     expect(result.body.data.quantity).toBe(10);
@@ -57,8 +64,8 @@ describe("PUT /api/carts/items", function () {
   });
 
   it("should reject if quantity is float number", async () => {
-    const product = await supertest(web).get("/api/products/pizza-0");
-    const result = await supertest(web).put("/api/carts/items").set("Authorization", token).send({ productSlug: product.body.data.slug, quantity: 5.5 });
+    const product = await request.get("/api/products/pizza-0");
+    const result = await request.put("/api/carts/items").set("Authorization", `Bearer ${token}`).send({ productSlug: product.body.data.slug, quantity: 5.5 });
 
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
@@ -66,8 +73,8 @@ describe("PUT /api/carts/items", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const product = await supertest(web).get("/api/products/pizza-0");
-    const result = await supertest(web).put("/api/carts/items").set("Authorization", "invalid-token").send({ productSlug: product.body.data.slug, quantity: 5 });
+    const product = await request.get("/api/products/pizza-0");
+    const result = await request.put("/api/carts/items").set("Authorization", "invalid-token").send({ productSlug: product.body.data.slug, quantity: 5 });
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
@@ -76,8 +83,12 @@ describe("PUT /api/carts/items", function () {
 });
 
 describe("DELETE /api/carts/items/:productSlug", function () {
+  let token;
+
   beforeEach(async () => {
     await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
   });
 
   afterEach(async () => {
@@ -85,9 +96,9 @@ describe("DELETE /api/carts/items/:productSlug", function () {
   });
 
   it("should can delete cart item of current user", async () => {
-    const user = await supertest(web).get("/api/users/current").set("Authorization", token);
-    const result = await supertest(web).delete(`/api/carts/items/${user.body.data.cart.cartItems[0].product.slug}`).set("Authorization", token);
-    const newUserData = await supertest(web).get("/api/users/current").set("Authorization", token);
+    const user = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
+    const result = await request.delete(`/api/carts/items/${user.body.data.cart.cartItems[0].productSlug}`).set("Authorization", `Bearer ${token}`);
+    const newUserData = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -95,9 +106,9 @@ describe("DELETE /api/carts/items/:productSlug", function () {
   });
 
   it("should reject if token is invalid", async () => {
-    const user = await supertest(web).get("/api/users/current").set("Authorization", token);
-    const result = await supertest(web).delete(`/api/carts/items/${user.body.data.cart.cartItems[0].id}`).set("Authorization", "invalid-token");
-    const newUserData = await supertest(web).get("/api/users/current").set("Authorization", token);
+    const user = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
+    const result = await request.delete(`/api/carts/items/${user.body.data.cart.cartItems[0].id}`).set("Authorization", "invalid-token");
+    const newUserData = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(401);
     expect(result.body.data).toBeUndefined();
@@ -106,9 +117,9 @@ describe("DELETE /api/carts/items/:productSlug", function () {
   });
 
   it("should reject if item id is invalid", async () => {
-    const user = await supertest(web).get("/api/users/current").set("Authorization", token);
-    const result = await supertest(web).delete("/api/carts/items/404").set("Authorization", token);
-    const newUserData = await supertest(web).get("/api/users/current").set("Authorization", token);
+    const user = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
+    const result = await request.delete("/api/carts/items/404").set("Authorization", `Bearer ${token}`);
+    const newUserData = await request.get("/api/users/current").set("Authorization", `Bearer ${token}`);
 
     expect(result.status).toBe(404);
     expect(result.body.data).toBeUndefined();

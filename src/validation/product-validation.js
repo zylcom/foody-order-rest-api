@@ -7,11 +7,15 @@ const searchProductValidation = z
     category: z.string().default(""),
     name: z.string().default(""),
     tag: z.string().default(""),
-    page: z.coerce.number({ invalid_type_error: "Page must be number!" }).min(1).positive().default(1),
-    size: z.coerce.number({ invalid_type_error: "Size must be number!" }).min(1).max(100).positive().default(10),
+    page: z.coerce.number({ invalid_type_error: "Page must be number!" }).min(1, { message: "Size must be at least 1." }).default(1),
+    size: z.coerce
+      .number({ invalid_type_error: "Size must be number!" })
+      .min(1, { message: "Size must be at least 1." })
+      .max(100, { message: "Size is to big. Please enter no more than 100." })
+      .default(10),
     getAll: z.boolean({ invalid_type_error: "Get all must be a boolean!" }).default(false),
   })
-  .strict();
+  .strip();
 
 const infiniteValidation = z
   .object({
