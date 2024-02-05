@@ -28,6 +28,7 @@ publicRouter.post("/api/carts/validate", cartController.validateCart);
 
 publicRouter.use(guestMiddleware);
 
+publicRouter.get("/api/orders", orderController.listOrder);
 publicRouter.post("/api/orders", orderController.create);
 publicRouter.get("/api/orders/:orderId", orderController.get);
 publicRouter.post("/api/orders/checkout", orderController.checkout);

@@ -64,4 +64,19 @@ const cancel = async (req, res, next) => {
   }
 };
 
-export default { create, checkout, get, cancel };
+const listOrder = async (req, res, next) => {
+  try {
+    const request = {
+      username: req?.user?.username,
+      guestUserId: req.guestUserId,
+    };
+
+    const result = await orderService.listOrder(request);
+
+    res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, checkout, get, cancel, listOrder };
