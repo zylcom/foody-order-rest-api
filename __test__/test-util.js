@@ -18,6 +18,17 @@ const tagsProduct = [
   { id: 2, name: "Tag 2", slug: "tag-2" },
   { id: 3, name: "Tag 3", slug: "tag-3" },
 ];
+const shippingDetails = {
+  address: "adres",
+  detail: "home detail",
+  city: "jkbar",
+  state: "Jkt",
+  postalCode: "11224",
+};
+const deliveryDetails = {
+  method: "express",
+  cost: 5000,
+};
 
 const createManyCartItems = () => {
   let items = [];
@@ -150,25 +161,45 @@ const removeTestReview = async () => {
   await prismaClient.review.deleteMany({});
 };
 
-const createPaymentTest = async (guestId) => {
+const createPaymentTest = async () => {
   await prismaClient.order.create({
     data: {
-      subTotal: 1001,
-      total: 1001,
-      items: { create: [{ price: 1001, productName: "Pizza-1", quantity: 1, product: { connect: { slug: "pizza-1" } } }] },
+      id: "76a1b635-5964-462d-a224-3a42008d9abb",
+      subTotal: 167500,
+      total: 167500,
+      name,
+      phone: phonenumberForm.number,
+      user: { connect: { username } },
+      items: { create: [{ price: 167500, productName: "Pizza-1", quantity: 1, product: { connect: { slug: "pizza-1" } } }] },
       status: "complete",
+      shipment: {
+        create: {
+          ...shippingDetails,
+          ...deliveryDetails,
+          name,
+          phone: phonenumberForm.number,
+        },
+      },
       payment: {
         create: {
-          amount: 1001,
-          method: "card",
+          amount: 167500,
+          currency: "IDR",
+          signatureKey: "1753c8db0376d14e8d92ab14cc8a0b781f935e92e7ba848388e63c276403bb749a0bad9d34e61b3bfbeacb481658ce5e8edb1a98d642d540c5091fe961da9d54",
+          method: "alfamart",
+          username,
           name,
-          paymentIntent: "pi_asd",
           status: "paid",
         },
       },
-      guestId,
     },
   });
+};
+
+const removePaymentTest = async () => {
+  await prismaClient.payment.deleteMany({});
+  await prismaClient.shipment.deleteMany({});
+  await prismaClient.orderItem.deleteMany({});
+  await prismaClient.order.deleteMany({});
 };
 
 export {
@@ -188,6 +219,7 @@ export {
   productPrice,
   productSlug,
   removeManyCartItems,
+  removePaymentTest,
   removeTestCategory,
   removeTestProduct,
   removeTestUser,

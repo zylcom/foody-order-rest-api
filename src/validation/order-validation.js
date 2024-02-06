@@ -116,4 +116,16 @@ const cancelOrderValidation = orderValidation.required({ orderId: true });
 
 const checkoutValidation = orderValidation.required({ orderId: true });
 
-export { createOrderValidation, checkoutValidation, getOrderValidation, cancelOrderValidation };
+const listOrderValidation = z
+  .object({
+    username: z
+      .string({ invalid_type_error: "Username must be a string!", required_error: "Username is required!" })
+      .min(1, { message: "Username is not allowed to be empty!" }),
+    guestUserId: z
+      .string({ invalid_type_error: "Guest user id must be a string!", required_error: "Guest user id is required!" })
+      .min(1, { message: "Guest user id not allowed to be empty" })
+      .uuid({ message: "Guest user id is invalid!" }),
+  })
+  .partial();
+
+export { createOrderValidation, checkoutValidation, getOrderValidation, cancelOrderValidation, listOrderValidation };

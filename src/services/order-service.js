@@ -1,6 +1,6 @@
 import cartService from "./cart-service.js";
 import validate from "../validation/validation.js";
-import { cancelOrderValidation, checkoutValidation, createOrderValidation, getOrderValidation } from "../validation/order-validation.js";
+import { cancelOrderValidation, checkoutValidation, createOrderValidation, getOrderValidation, listOrderValidation } from "../validation/order-validation.js";
 import { prismaClient } from "../app/database.js";
 import { ResponseError } from "../errors/response-error.js";
 import { calculateTotalPrice } from "../utils/index.js";
@@ -160,4 +160,13 @@ const cancel = async (request) => {
   return prismaClient.order.update({ where: { id: order.id }, data: { status: "canceled" }, include: { items: { include: { product: true } } } });
 };
 
-export default { create, checkout, get, cancel };
+const listOrder = async (request) => {
+  request = validate(listOrderValidation, request);
+
+  return prismaClient.order.findMany({
+    where: { OR: [{ username: request.username }, { guestId: request.guestUserId }] },
+    include: { items: true, payment: true, shipment: true, user: true },
+  });
+};
+
+export default { create, checkout, get, cancel, listOrder };
