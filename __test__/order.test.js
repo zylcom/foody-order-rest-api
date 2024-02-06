@@ -350,3 +350,38 @@ describe("POST /api/orders/:orderId/cancel", function () {
     expect(result.body.errors).toBeDefined();
   });
 });
+
+describe("GET /api/orders", function () {
+  let token;
+
+  beforeEach(async () => {
+    await createTestUser();
+
+    token = (await request.post("/api/users/login").send({ username, password })).body.data.token;
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can get list order of guest user", async () => {
+    const guestUser = await request.get("/api/users/guest");
+    const cart = {
+      cartItems: [{ productSlug: "pizza-1", quantity: 1 }],
+      totalPrice: 10001,
+    };
+    const order = await request.post("/api/orders").query({ guest_uid: guestUser.body.data.guestUserId }).send({
+      cart,
+      customerDetails,
+      shippingDetails,
+      deliveryDetails,
+    });
+
+    const result = await request.get("/api/orders").query({ guest_uid: guestUser.body.data.guestUserId });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.length).toBeGreaterThan(0);
+    expect(result.body.data[0].id).toBe(order.body.data.id);
+    expect(result.body.data[0].name).toBe(order.body.data.name);
+  });
+});
