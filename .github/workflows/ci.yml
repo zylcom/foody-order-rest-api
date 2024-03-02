@@ -10,7 +10,7 @@ on:
     branches: ["main"]
 
 jobs:
-  start_postgresql:
+  automation_testing:
     environment: production
     runs-on: ubuntu-latest
 
