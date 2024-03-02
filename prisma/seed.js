@@ -41,9 +41,25 @@ const tags = [
   { id: 25, name: "Ginger", slug: "ginger" },
   { id: 26, name: "Wine", slug: "wine" },
 ];
+// const users = [
+
+// ];
+
 const users = [
   {
-    id: 2,
+    username: "zylcom.dev",
+    phonenumber: "0812-3456-7890",
+    password: password_hash,
+    profile: {
+      create: {
+        name: "Zylcom",
+        avatar: faker.internet.avatar(),
+        address: "Indonesia",
+      },
+    },
+    cart: { create: {} },
+  },
+  {
     username: "sabil.dev",
     phonenumber: "0898-7654-3210",
     password: password_hash,
@@ -54,24 +70,24 @@ const users = [
         address: "Indonesia",
       },
     },
+    cart: { create: {} },
   },
-];
-
-for (let index = 3; index <= createUserCount; index++) {
-  users.push({
-    id: index,
-    username: faker.internet.userName(),
-    phonenumber: faker.phone.number(),
-    password: password_hash,
-    profile: {
-      create: {
-        name: faker.person.fullName(),
-        avatar: faker.internet.avatar(),
-        address: faker.location.country(),
+  ...Array.from({ length: createUserCount }, (_, index) => {
+    return {
+      username: faker.internet.userName(),
+      phonenumber: faker.phone.number(),
+      password: password_hash,
+      profile: {
+        create: {
+          name: faker.person.fullName(),
+          avatar: faker.internet.avatar(),
+          address: faker.location.country(),
+        },
       },
-    },
-  });
-}
+      cart: { create: {} },
+    };
+  }),
+];
 
 async function productsData() {
   return [
@@ -948,26 +964,11 @@ async function main() {
   });
   const tagCount = await prismaClient.tag.createMany({ data: tags });
 
-  await prismaClient.user.create({
-    data: {
-      id: 1,
-      username: "zylcom.dev",
-      phonenumber: "0812-3456-7890",
-      password: password_hash,
-      profile: {
-        create: {
-          name: "Zylcom",
-          avatar: faker.internet.avatar(),
-          address: "Indonesia",
-        },
-      },
-      cart: { create: { id: 1 } },
-    },
-    include: { cart: { include: { cartItems: true } } },
-  });
   users.forEach(async (user) => {
+    console.log(user);
+
     const result = await prismaClient.user.create({
-      data: { ...user, cart: { create: {} } },
+      data: { ...user },
       include: { cart: { include: { cartItems: true } } },
     });
 
@@ -1033,7 +1034,7 @@ async function main() {
       }
 
       await prismaClient.cart.update({
-        where: { id: 1 },
+        where: { username: "zylcom.dev" },
         data: { totalPrice },
       });
 
