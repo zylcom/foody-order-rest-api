@@ -157,7 +157,11 @@ const cancel = async (request) => {
     throw new ResponseError(404, "Order not found");
   }
 
-  return prismaClient.order.update({ where: { id: order.id }, data: { status: "canceled" }, include: { items: { include: { product: true } } } });
+  return prismaClient.order.update({
+    where: { id: order.id },
+    data: { status: "canceled" },
+    include: { payment: true, shipment: true, items: { include: { product: true } } },
+  });
 };
 
 const listOrder = async (request) => {
