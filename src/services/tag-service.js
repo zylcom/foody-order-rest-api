@@ -5,7 +5,7 @@ import { filterValidation } from "../validation/tag-validation.js";
 const get = (filter) => {
   filter = validate(filterValidation, filter);
 
-  return prismaClient.tag.findMany({ where: { products: { some: { categorySlug: { contains: filter.categorySlug } } } } });
+  return prismaClient.tag.findMany({ where: { products: { some: { categorySlug: { contains: filter.categorySlug, mode: "insensitive" } } } } });
 };
 
 export default { get };

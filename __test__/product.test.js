@@ -8,7 +8,6 @@ import {
   productSlug,
   removeTestProduct,
   removeTestUser,
-  token,
 } from "./test-util";
 import { request } from "./setup";
 
@@ -107,7 +106,7 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using name", async () => {
-    const result = await request.get("/api/products/search").query({ name: "1" });
+    const result = await request.get("/api/products/search").query({ name: "pizza 1" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -118,7 +117,7 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using category", async () => {
-    const result = await request.get("/api/products/search").query({ category: "food" });
+    const result = await request.get("/api/products/search").query({ category: "Food" });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -129,7 +128,7 @@ describe("GET /api/products/search", function () {
   });
 
   it("should can search using tag", async () => {
-    const result = await request.get("/api/products/search").query({ tag: "tag" });
+    const result = await request.get("/api/products/search").query({ tag: "Tag" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -141,11 +140,11 @@ describe("GET /api/products/search", function () {
 
   it("should can search using tag, name, category, size, page", async () => {
     const result = await request.get("/api/products/search").query({
-      category: "food",
-      name: "pizza",
+      category: "fOod",
+      name: "piZza",
       page: 2,
       size: 15,
-      tag: "tag",
+      tag: "tAg",
     });
 
     expect(result.status).toBe(200);
@@ -178,18 +177,18 @@ describe("GET /api/products", function () {
   });
 
   it("should can get products using name", async () => {
-    const result = await request.get("/api/products").query({ name: "5" });
+    const result = await request.get("/api/products").query({ name: "piZza 5" });
 
     expect(result.status).toBe(200);
-    expect(result.body.data.length).toBe(2);
+    expect(result.body.data.length).toBe(1);
     expect(result.body.paging).toBeDefined();
-    expect(result.body.paging.totalProducts).toBe(2);
+    expect(result.body.paging.totalProducts).toBe(1);
     expect(result.body.paging.hasNextPage).toBe(false);
     expect(result.body.paging.nextCursor).toBe(result.body.data.at(-1).id);
   });
 
   it("should can get products using tag", async () => {
-    const result = await request.get("/api/products").query({ tag: "tag" });
+    const result = await request.get("/api/products").query({ tag: "tAg" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBe(10);
@@ -200,7 +199,7 @@ describe("GET /api/products", function () {
   });
 
   it("should can get products using category", async () => {
-    const result = await request.get("/api/products").query({ category: "foo" });
+    const result = await request.get("/api/products").query({ category: "fOo" });
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
@@ -225,9 +224,9 @@ describe("GET /api/products", function () {
   it("should can get products using cursor, name, category and tag", async () => {
     const product = await request.get("/api/products/pizza-1");
     const result = await request.get("/api/products").query({
-      name: "1",
-      category: "foo",
-      tag: "tag",
+      name: "PiZZa 1",
+      category: "foO",
+      tag: "taG",
       cursor: product.body.data.id,
     });
 
@@ -257,7 +256,7 @@ describe("GET /api/products/best-rated", function () {
   });
 
   it("should can get best rated products with category drink", async () => {
-    const result = await request.get("/api/products/best-rated").query({ category: "drink" });
+    const result = await request.get("/api/products/best-rated").query({ category: "driNk" });
 
     expect(result.status).toBe(200);
     expect(result.body.data.length).toBeLessThan(6);

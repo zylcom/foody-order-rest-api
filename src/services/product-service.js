@@ -47,16 +47,16 @@ const search = async (request) => {
   const filters = [];
 
   if (request.name) {
-    filters.push({ name: { contains: request.name } });
+    filters.push({ name: { contains: request.name, mode: "insensitive" } });
   }
 
   if (request.category) {
-    filters.push({ category: { slug: { contains: request.category } } });
+    filters.push({ category: { slug: { contains: request.category, mode: "insensitive" } } });
   }
 
   if (request.tag) {
     filters.push({
-      tags: { some: { slug: { contains: request.tag } } },
+      tags: { some: { slug: { contains: request.tag, mode: "insensitive" } } },
     });
   }
 
@@ -100,9 +100,9 @@ const infinite = async (request) => {
     take: request.cursor ? request.size + 1 : request.size,
     cursor: request.cursor ? { id: request.cursor } : undefined,
     where: {
-      name: { contains: request.name },
-      category: { slug: { contains: request.category } },
-      tags: { some: { slug: { contains: request.tag } } },
+      name: { contains: request.name, mode: "insensitive" },
+      category: { slug: { contains: request.category, mode: "insensitive" } },
+      tags: { some: { slug: { contains: request.tag, mode: "insensitive" } } },
     },
     include: {
       likes: true,
@@ -125,9 +125,9 @@ const infinite = async (request) => {
   const totalItems = await prismaClient.product
     .count({
       where: {
-        name: { contains: request.name },
-        category: { slug: { contains: request.category } },
-        tags: { some: { slug: { contains: request.tag } } },
+        name: { contains: request.name, mode: "insensitive" },
+        category: { slug: { contains: request.category, mode: "insensitive" } },
+        tags: { some: { slug: { contains: request.tag, mode: "insensitive" } } },
       },
     })
     .then((result) => (!!result ? result : 0));
@@ -135,9 +135,9 @@ const infinite = async (request) => {
   const hasNextPage = await prismaClient.product
     .count({
       where: {
-        name: { contains: request.name },
-        category: { slug: { contains: request.category } },
-        tags: { some: { slug: { contains: request.tag } } },
+        name: { contains: request.name, mode: "insensitive" },
+        category: { slug: { contains: request.category, mode: "insensitive" } },
+        tags: { some: { slug: { contains: request.tag, mode: "insensitive" } } },
       },
       cursor: { id: nextCursor },
       skip: 1,
@@ -162,7 +162,7 @@ const getBestRated = async (category) => {
 
   return await prismaClient.product
     .findMany({
-      where: { category: { slug: { contains: category } } },
+      where: { category: { slug: { contains: category, mode: "insensitive" } } },
       orderBy: { averageRating: "desc" },
       include: { likes: true },
     })
